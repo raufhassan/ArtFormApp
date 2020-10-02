@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Button, TextInput } from "react-native";
 import Style from "./style";
 import AsyncStorage from "@react-native-community/async-storage";
 
-export default class Home extends Component {
+export default class Form extends Component {
   constructor(props) {
     super(props);
 
@@ -17,12 +17,8 @@ export default class Home extends Component {
     e.preventDefault();
     var userId = this.state.id;
     await AsyncStorage.setItem("id", userId);
-    this.props.navigation.navigate("Form");
+    this.props.navigation.navigate("Tab1");
   }
-  static navigationOptions = {
-    //To hide the ActionBar/NavigationBar
-    header: null,
-  };
 
   async componentDidMount() {
     /*   if (AsyncStorage.getItem("id") !== null) {
@@ -30,7 +26,7 @@ export default class Home extends Component {
     } else {
       console.log("enter id");
     } */
-    try {
+    /*   try {
       var value = await AsyncStorage.getItem("id");
       if (value !== "") {
         // We have data!!
@@ -40,7 +36,7 @@ export default class Home extends Component {
     } catch (error) {
       // Error retrieving data
       console.log("enter user id");
-    }
+    } */
   }
 
   // componentDidUpdate(prevProps, prevState, snapshot) {
@@ -76,7 +72,7 @@ export default class Home extends Component {
         />
 
         <TouchableOpacity
-          onPress={() => this.props.navigation.navigate("Form")}
+          onPress={() => this.props.navigation.navigate("Tab1")}
         >
           <Text> Go to Form </Text>
         </TouchableOpacity>
@@ -85,15 +81,12 @@ export default class Home extends Component {
         >
           <Text> Go to tab2 </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate("Tab3")}
+        >
+          <Text> Go to tab3 </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 }
-
-/* export default function Home({ navigation }) {
-  return (
-    <View>
-      <Text onPress={() => navigation.navigate("Form")}>this is home</Text>
-    </View>
-  );
-} */

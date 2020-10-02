@@ -11,8 +11,8 @@ export default Style = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     // justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 50,
+    // alignItems: "center",
+    padding: hp(7),
   },
   scrollContainer: {
     // backgroundColor: "#53206a",
@@ -83,5 +83,8 @@ export default Style = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 8,
     justifyContent: "center",
+  },
+  label: {
+    fontSize: hp("3%"),
   },
 });
