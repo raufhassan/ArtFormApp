@@ -15,6 +15,7 @@ import RadioForm from "react-native-simple-radio-button";
 import SelectMultiple from "react-native-select-multiple";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-community/async-storage";
+import ImagePicker from "react-native-image-crop-picker";
 
 const options = ["Ration", "Education ", "Small Business Support", "Health"];
 
@@ -34,6 +35,7 @@ export default class Tab3 extends Component {
       selectedFor: [],
       disease: "",
       Remarks: "",
+      imagesUri: [],
     };
   }
   onSelectionsChange = (selectedFor) => {
@@ -49,6 +51,41 @@ export default class Tab3 extends Component {
       console.log(error.message);
     }
   }
+  OpenLibrary = () => {
+    ImagePicker.openPicker({
+      multiple: true,
+      waitAnimationEnd: false,
+      includeExif: true,
+      forceJpg: true,
+      maxFiles: 5,
+      compressImageQuality: 0.8,
+      mediaType: "photo",
+    }).then((images) => {
+      console.log(images);
+
+      const uri = images.map((el, index) => {
+        // console.log("recieved image", el);
+        //  uri[index] = el.path;
+        return el.path;
+      });
+      console.log(uri);
+      this.setState({ imagesUri: uri });
+    });
+  };
+  renderImage = (image) => {
+    return (
+      <Image
+        style={{
+          width: 185,
+          height: 128,
+          backgroundColor: "#fff",
+          marginTop: 1,
+          resizeMode: "contain",
+        }}
+        source={{ uri: image }}
+      />
+    );
+  };
   onHealth = () => {
     var count = 0;
     this.state.selectedFor.map((item) => {
@@ -90,7 +127,8 @@ export default class Tab3 extends Component {
   }
 
   render() {
-    console.log(this.state.selectedFor);
+    /*   console.log("state variable", this.state.selectedFor);
+    console.log(this.state.imagesUri); */
     return (
       <ScrollView style={Style.scrollContainer}>
         <View style={Style.container}>
@@ -129,6 +167,32 @@ export default class Tab3 extends Component {
             placeholder={"Remarks"}
             style={Style.input}
           ></TextInput>
+          <TouchableOpacity style={Style.upload} onPress={this.OpenLibrary}>
+            <Text style={{ color: "#fff" }}>upload images</Text>
+          </TouchableOpacity>
+          <ScrollView horizontal>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              {this.state.imagesUri
+                ? this.state.imagesUri.map((el, index) => {
+                    console.log(el);
+                    return (
+                      <View
+                        style={
+                          {
+                            // width: 185, height: 128,
+                            //  width:'50%',
+                            // flexBasis: "33.33%",
+                          }
+                        }
+                        key={index}
+                      >
+                        {this.renderImage(el)}
+                      </View>
+                    );
+                  })
+                : null}
+            </View>
+          </ScrollView>
           <Button
             title={"submit"}
             style={Style.submit}

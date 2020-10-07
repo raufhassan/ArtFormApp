@@ -26,17 +26,17 @@ export default class Form extends Component {
     } else {
       console.log("enter id");
     } */
-    /*   try {
+    try {
       var value = await AsyncStorage.getItem("id");
       if (value !== "") {
         // We have data!!
         console.log(value);
-        this.props.navigation.navigate("Form");
+        this.props.navigation.navigate("Tab1");
       }
     } catch (error) {
       // Error retrieving data
       console.log("enter user id");
-    } */
+    }
   }
 
   // componentDidUpdate(prevProps, prevState, snapshot) {

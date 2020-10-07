@@ -87,4 +87,9 @@ export default Style = StyleSheet.create({
   label: {
     fontSize: hp("3%"),
   },
+  upload: {
+    backgroundColor: "grey",
+    padding: 10,
+    marginBottom: 10,
+  },
 });

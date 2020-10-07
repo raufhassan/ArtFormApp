@@ -14,11 +14,16 @@ import { openDatabase } from "react-native-sqlite-storage";
 import Style from "../styles";
 // import DatePicker from "@react-native-community/datetimepicker";
 import DatePicker from "react-native-datepicker";
-
+import RadioForm from "react-native-simple-radio-button";
 import AsyncStorage from "@react-native-community/async-storage";
 import ImagePicker from "react-native-image-picker";
-
+// import ValidationComponent from "react-native-form-validator";
 var db = openDatabase({ name: "UserDatabase.db" });
+
+var radio_props = [
+  { label: "no  ", value: 0 },
+  { label: "yes", value: 1 },
+];
 
 export default class Tab1 extends Component {
   constructor(props) {
@@ -27,14 +32,18 @@ export default class Tab1 extends Component {
     this.state = {
       first_name: "",
       last_name: "",
-      Religion: "",
+      Religion: "Islam",
       date: "",
       RelStatus: "",
       cell: "",
+      Address: "",
+      Town: "Surjani",
+      Area: "",
       profession: "",
-      empStatus: "",
+      empStatus: "Employed",
       MonthlyIncome: 0,
       skills: "",
+      zakat: 0,
       gender: "male",
       guardian: "",
       filepath: {
@@ -43,25 +52,60 @@ export default class Tab1 extends Component {
       },
       fileData: "",
       fileUri: "",
+      error: "",
     };
-
-    /*     db.transaction(function (txn) {
-      txn.executeSql(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='table_user'",
-        [],
-        function (tx, res) {
-          console.log("item:", res.rows.length);
-          if (res.rows.length == 0) {
-            txn.executeSql("DROP TABLE IF EXISTS table_user", []);
-            txn.executeSql(
-              "CREATE TABLE IF NOT EXISTS table_user(user_id INTEGER PRIMARY KEY AUTOINCREMENT, user_name VARCHAR(20), user_contact INT(10), user_email VARCHAR(20))",
-              []
-            );
-          }
-        }
-      );
-    }); */
   }
+
+  validate = () => {
+    var reg = /^((\+92))-{0,1}\d{3}-{0,1}\d{7}$|^\d{11}$|^\d{4}-\d{7}$/;
+    const {
+      first_name,
+      last_name,
+      date,
+      Address,
+      Area,
+      cell,
+      fileUri,
+      guardian,
+    } = this.state;
+    if (first_name === "" || last_name === "") {
+      this.setState({ error: "name field is empty" });
+      return false;
+    }
+    if (first_name.length < 3) {
+      this.setState({ error: "name field must be greater than 2 words " });
+      return false;
+    }
+    if (date === "") {
+      this.setState({ error: "date field is empty" });
+      return false;
+    }
+    if (Address === "") {
+      this.setState({ error: "Address field is empty" });
+      return false;
+    }
+    if (Address.length < 7) {
+      this.setState({ error: "Address must be greater than 7 words" });
+      return false;
+    }
+    if (Area === "") {
+      this.setState({ error: "Area field is empty" });
+      return false;
+    }
+    if (fileUri === "") {
+      this.setState({ error: "Cnic image not uploaded" });
+      return false;
+    }
+    if (guardian === "") {
+      this.setState({ error: "Guardian field is empty" });
+      return false;
+    }
+    if (cell !== "") {
+      return reg.test(this.state.cell);
+    }
+    return true;
+  };
+
   async componentDidMount() {
     try {
       const retrievedItem = await AsyncStorage.getItem("Personal");
@@ -72,25 +116,32 @@ export default class Tab1 extends Component {
     }
   }
   async onSubmit(e) {
+    e.preventDefault();
+
     var state = this.state;
     console.log(state.fileUri);
+    var isValid = this.validate();
     e.preventDefault();
-    let personalInfo = {
-      first_name: state.first_name,
-      last_name: state.last_name,
-      Religion: state.Religion,
-      date: state.date,
-      RelStatus: state.RelStatus,
-      cell: state.cell,
-      profession: state.profession,
-      empStatus: state.empStatus,
-      MonthlyIncome: state.MonthlyIncome,
-      skills: state.skills,
-      cnic: state.fileUri,
-    };
-    console.log(personalInfo);
-    await AsyncStorage.setItem("Personal", JSON.stringify(personalInfo));
-    this.props.navigation.navigate("Tab2");
+    if (isValid) {
+      let personalInfo = {
+        first_name: state.first_name,
+        last_name: state.last_name,
+        Religion: state.Religion,
+        date: state.date,
+        RelStatus: state.RelStatus,
+        cell: state.cell,
+        profession: state.profession,
+        empStatus: state.empStatus,
+        MonthlyIncome: state.MonthlyIncome,
+        skills: state.skills,
+        cnic: state.fileUri,
+      };
+      console.log(personalInfo);
+      await AsyncStorage.setItem("Personal", JSON.stringify(personalInfo));
+      this.props.navigation.navigate("Tab2");
+    } else {
+      Alert.alert(this.state.error);
+    }
   }
   chooseImage = () => {
     let options = {
@@ -119,7 +170,8 @@ export default class Tab1 extends Component {
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         // alert(JSON.stringify(response));s
-        console.log("response", JSON.stringify(response));
+        // console.log("response", JSON.stringify(response));
+        console.log(source);
         this.setState({
           filePath: response,
           fileData: response.data,
@@ -147,7 +199,7 @@ export default class Tab1 extends Component {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
-        console.log("response", JSON.stringify(response));
+        // console.log("response", JSON.stringify(response));
         this.setState({
           filePath: response,
           fileData: response.data,
@@ -163,78 +215,29 @@ export default class Tab1 extends Component {
         <Image source={{ uri: this.state.fileUri }} style={Style.images} />
       );
     } else {
-      return (
-        <Image
+      return null;
+      /*  <Image
           source={require("../../../../assets/images/image1.jpg")}
           style={Style.images}
-        />
-      );
+        /> */
     }
   }
-  InsertDBAction = () => {
-    console.log("insertDB Called");
-    if (this.state.user_name) {
-      if (this.state.user_contact) {
-        if (this.state.user_email) {
-          db.transaction((tx) => {
-            // Loop would be here in case of many values
-
-            tx.executeSql(
-              "INSERT INTO table_user (user_id, user_name, user_contact, user_email) VALUES (?,?,?,?)",
-              [
-                this.state.input_user_id,
-                this.state.user_name,
-                this.state.user_contact,
-                this.state.user_email,
-              ],
-              (tx, results) => {
-                console.log("Insert Results", results.rowsAffected);
-                if (results.rowsAffected > 0) {
-                  Alert.alert(
-                    "Success",
-                    "User updated successfully",
-                    [
-                      {
-                        text: "Ok",
-                        onPress: () => that.props.navigation.navigate("Home"),
-                      },
-                    ],
-                    { cancelable: false }
-                  );
-                } else {
-                  alert("Updation Failed");
-                }
-              }
-            );
-          });
-        } else {
-          alert("Please fill Address");
-        }
-      } else {
-        alert("Please fill Contact Number");
-      }
-    } else {
-      alert("Please fill Name");
-    }
-  };
 
   render() {
     const father = (
       <TextInput
         value={this.state.guardian}
-        onChangeText={this.handleIncome}
+        onChangeText={(guardian) => this.setState({ guardian })}
         placeholder={"S/o"}
         style={Style.input}
-        keyboardType={"numeric"}
       />
     );
     const husband = (
       <TextInput
         value={this.state.guardian}
-        onChangeText={this.handleIncome}
+        onChangeText={(guardian) => this.setState({ guardian })}
         placeholder={"W/o , D/o "}
         style={Style.input}
-        keyboardType={"numeric"}
       />
     );
     return (
@@ -251,6 +254,7 @@ export default class Tab1 extends Component {
             value={this.state.last_name}
             onChangeText={(last_name) => this.setState({ last_name })}
             placeholder={"Last name"}
+            placeholderTextColor="#000"
             style={Style.input}
           ></TextInput>
           <View style={Style.picker}>
@@ -264,6 +268,39 @@ export default class Tab1 extends Component {
             </Picker>
           </View>
           {this.state.gender === "male" ? father : husband}
+          <View style={Style.picker}>
+            <Picker
+              selectedValue={this.state.Religion}
+              style={Style.picker}
+              onValueChange={(value) => {
+                if (value == -1) {
+                  this.setState({ Religion: "" });
+                } else {
+                  this.setState({ Religion: value });
+                }
+              }}
+            >
+              <Picker.Item label="select relegion" value="-1" />
+              <Picker.Item label="Islam" value="Islam" />
+              <Picker.Item label="Chritianity" value="Chritianity" />
+              <Picker.Item label="Hinduism" value="Hinduism" />
+              <Picker.Item label="jew" value="jew" />
+              <Picker.Item label="other" value="other" />
+            </Picker>
+          </View>
+          {this.state.Religion === "Islam" ? (
+            <View>
+              <Text>Eligible for zakat?</Text>
+              <RadioForm
+                radio_props={radio_props}
+                initial={0}
+                formHorizontal={true}
+                onPress={(event) => this.setState({ zakat: event })}
+              />
+            </View>
+          ) : (
+            <View></View>
+          )}
 
           <DatePicker
             style={Style.Date}
@@ -310,8 +347,35 @@ export default class Tab1 extends Component {
             value={this.state.cell}
             onChangeText={(cell) => this.setState({ cell })}
             placeholder={"Contact"}
+            keyboardType={"numeric"}
             style={Style.input}
           ></TextInput>
+          <TextInput
+            value={this.state.Address}
+            onChangeText={(Address) => this.setState({ Address })}
+            placeholder={"Address"}
+            style={Style.input}
+          ></TextInput>
+          <View style={Style.picker}>
+            <Picker
+              selectedValue={this.state.Town}
+              style={Style.picker}
+              onValueChange={(Town) => this.setState({ Town: Town })}
+            >
+              <Picker.Item label="Surjani" value="Surjani" />
+              <Picker.Item label="North karachi" value="North karachi" />
+              <Picker.Item label="New Karachi" value="New Karachi" />
+              <Picker.Item label="Korangi" value="Korangi" />
+              <Picker.Item label="others" value="others" />
+            </Picker>
+          </View>
+          <TextInput
+            value={this.state.Area}
+            onChangeText={(Area) => this.setState({ Area })}
+            placeholder={"Area"}
+            style={Style.input}
+          ></TextInput>
+
           <View style={Style.picker}>
             <Picker
               selectedValue={this.state.profession}
@@ -363,27 +427,12 @@ export default class Tab1 extends Component {
             </View>
           </View>
 
-          {/*       <TouchableOpacity
-          onPress={() => this.InsertDBAction()}
-          style={{
-            marginLeft: 40,
-            marginRight: 40,
-            marginBottom: 20,
-            marginTop: 40,
-            backgroundColor: "#E8590A",
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 30,
-          }}
-        >
-          <Text> Insert into Database </Text>
-        </TouchableOpacity> */}
           <Button
             title={"submit"}
             style={Style.submit}
             onPress={this.onSubmit.bind(this)}
           />
+          <Text></Text>
         </View>
       </ScrollView>
     );
