@@ -33,9 +33,13 @@ export default class Tab3 extends Component {
     this.state = {
       familyIs: "",
       selectedFor: [],
+      typeErr: "",
       disease: "",
+      diseaseErr: "",
       Remarks: "",
+      RemarksErr: "",
       imagesUri: [],
+      imageErr: "",
     };
   }
   onSelectionsChange = (selectedFor) => {
@@ -51,6 +55,41 @@ export default class Tab3 extends Component {
       console.log(error.message);
     }
   }
+  validate = () => {
+    var errors = [];
+    const { selectedFor, disease, Remarks, imagesUri } = this.state;
+    var count = 0;
+    this.state.selectedFor.map((item) => {
+      if (item.value === "Health") {
+        count = count + 1;
+      }
+    });
+    if (selectedFor.length === 0) {
+      this.setState({ typeErr: "please select atleast one option" });
+      errors.push("type error");
+    } else {
+      this.setState({ typeErr: "" });
+    }
+    if (count === 1 && disease === "") {
+      this.setState({ diseaseErr: "please select disease" });
+      errors.push("disease error");
+    } else {
+      this.setState({ diseaseErr: "" });
+    }
+    if (Remarks === "") {
+      this.setState({ RemarksErr: "Remarks field empty" });
+      errors.push("remark error");
+    } else {
+      this.setState({ RemarksErr: "" });
+    }
+    if (imagesUri.length === 0) {
+      this.setState({ imageErr: "please upload images" });
+      errors.push("images error");
+    } else {
+      this.setState({ imageErr: "" });
+    }
+    return errors;
+  };
   OpenLibrary = () => {
     ImagePicker.openPicker({
       multiple: true,
@@ -96,39 +135,47 @@ export default class Tab3 extends Component {
     console.log(count);
     if (count == 1) {
       return (
-        <View style={{ marginVertical: 10 }}>
-          <DropDownPicker
-            items={[
-              { label: "hepatitas", value: "hepatitas" },
-              { label: "Cancer", value: "Cancer" },
-              { label: "Covid 19", value: "Covid 19" },
-            ]}
-            defaultValue={this.state.disease}
-            containerStyle={{ height: 40 }}
-            style={{ backgroundColor: "#fafafa" }}
-            placeholder={"select a disease"}
-            itemStyle={{
-              justifyContent: "flex-start",
-            }}
-            dropDownStyle={{ backgroundColor: "#fafafa" }}
-            onChangeItem={(item) =>
-              this.setState({
-                disease: item.value,
-              })
-            }
-          />
-        </View>
+        <>
+          <View style={{ marginVertical: 10 }}>
+            <DropDownPicker
+              items={[
+                { label: "hepatitas", value: "hepatitas" },
+                { label: "Cancer", value: "Cancer" },
+                { label: "Covid 19", value: "Covid 19" },
+              ]}
+              defaultValue={this.state.disease}
+              containerStyle={{ height: 40 }}
+              style={{ backgroundColor: "#fafafa" }}
+              placeholder={"select a disease"}
+              itemStyle={{
+                justifyContent: "flex-start",
+              }}
+              dropDownStyle={{ backgroundColor: "#fafafa" }}
+              onChangeItem={(item) =>
+                this.setState({
+                  disease: item.value,
+                })
+              }
+            />
+          </View>
+          {this.state.diseaseErr ? (
+            <Text style={Style.error}>{this.state.diseaseErr}</Text>
+          ) : null}
+        </>
       );
     }
   };
-  onSubmit(e) {
-    e.preventDefault(e);
-    Alert.alert(this.state.familyIs);
+  onSubmit() {
+    // e.preventDefault(e);
+    isValid = this.validate();
+    console.log(isValid);
+    console.log(isValid.length);
   }
 
   render() {
     /*   console.log("state variable", this.state.selectedFor);
     console.log(this.state.imagesUri); */
+    const { RemarksErr, typeErr, imageErr } = this.state;
     return (
       <ScrollView style={Style.scrollContainer}>
         <View style={Style.container}>
@@ -151,6 +198,8 @@ export default class Tab3 extends Component {
               onSelectionsChange={this.onSelectionsChange}
             />
           </View>
+          {typeErr ? <Text style={Style.error}>{typeErr}</Text> : null}
+
           {/*    {this.onHealth() ? (
           <View>
             <Text>disease</Text>
@@ -167,9 +216,12 @@ export default class Tab3 extends Component {
             placeholder={"Remarks"}
             style={Style.input}
           ></TextInput>
+          {RemarksErr ? <Text style={Style.error}>{RemarksErr}</Text> : null}
           <TouchableOpacity style={Style.upload} onPress={this.OpenLibrary}>
             <Text style={{ color: "#fff" }}>upload images</Text>
           </TouchableOpacity>
+          {imageErr ? <Text style={Style.error}>{imageErr}</Text> : null}
+
           <ScrollView horizontal>
             <View style={{ flex: 1, flexDirection: "row" }}>
               {this.state.imagesUri

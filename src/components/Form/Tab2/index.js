@@ -29,12 +29,16 @@ class Tab2 extends Component {
       Dependents: [
         {
           name: "",
+          nameErr: "",
           DOB: "",
+          dateErr: "",
           income: "",
+          incomeErr: "",
           Relation: "",
           Education: "",
           councelling: 0,
           EducationSupport: 0,
+          age: null,
         },
       ],
       DepArray: {
@@ -46,17 +50,108 @@ class Tab2 extends Component {
         councelling: 0,
         EducationSupport: 0,
       },
-
-      EducationExp: 0,
-      OverallIncome: 0,
-      Rent: 0,
-      Uitility: 0,
+      EducationExp: "",
+      EduErr: "",
+      OverallIncome: "",
+      incomeErr: "",
+      Rent: "",
+      rentErr: "",
+      Utility: "",
+      utilErr: "",
+      error: "",
     };
     this.onAdd = this.onAdd.bind(this);
     // this.handleOnChange = this.handleOnChange.bind(this);
   }
 
   componentDidMount() {}
+  valdateDependent = () => {
+    // let isvalid;
+    var error = [];
+    this.state.Dependents.map((item, index) => {
+      if (item.name === "") {
+        var data = this.state.Dependents;
+        data[index].nameErr = "Dependent name is empty";
+        this.setState({ Dependents: data });
+        error.push("err");
+      } else {
+        var data = this.state.Dependents;
+        data[index].nameErr = "";
+        this.setState({ Dependents: data });
+      }
+      if (item.DOB === "") {
+        var data = this.state.Dependents;
+        data[index].dateErr = "date field is empty";
+        this.setState({ Dependents: data });
+        error.push("err");
+      } else {
+        var data = this.state.Dependents;
+        data[index].dateErr = "";
+        this.setState({ Dependents: data });
+      }
+      if (this.getAge(item.DOB) > 3 && item.income === "") {
+        var data = this.state.Dependents;
+        data[index].incomeErr = "income field is empty";
+        this.setState({ Dependents: data });
+        error.push("err");
+      } else {
+        var data = this.state.Dependents;
+        data[index].incomeErr = "";
+        this.setState({ Dependents: data });
+      }
+
+      /*    if (item.DOB !== "") {
+        var data = this.state.Dependents;
+        data[index].dateErr = "";
+        this.setState({ Dependents: data });
+      }
+      if (item.DOB !== "") {
+        var data = this.state.Dependents;
+        data[index].dateErr = "";
+        this.setState({ Dependents: data });
+      } */
+
+      /*   if(item.Relation===""){
+        this.setState({error:"Dependent DOB is empty"});
+        return false
+      }
+      if(item.Education===""){
+        this.setState({error:"Dependent DOB is empty"});
+        return false
+      } */
+    });
+    // return isvalid.every((x) => x === true);
+    return error;
+  };
+  validateOther = () => {
+    var errors = [];
+    var { EducationExp, OverallIncome, Rent, Utility } = this.state;
+    if (Rent === "") {
+      this.setState({ rentErr: "Rent expense empty" });
+      errors.push("rent err");
+    } else {
+      this.setState({ rentErr: "" });
+    }
+    if (Utility === "") {
+      this.setState({ utilErr: "Utiltiy expense empty" });
+      errors.push("utility err");
+    } else {
+      this.setState({ utilErr: "" });
+    }
+    if (EducationExp === "") {
+      this.setState({ EduErr: "Education expense empty" });
+      errors.push("education err");
+    } else {
+      this.setState({ EduErr: "" });
+    }
+    if (OverallIncome === "") {
+      this.setState({ incomeErr: "overall income empty" });
+      errors.push("income err");
+    } else {
+      this.setState({ incomeErr: "" });
+    }
+    return errors;
+  };
 
   getAge(DOB) {
     var today = new Date();
@@ -66,8 +161,6 @@ class Tab2 extends Component {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age = age - 1;
     }
-    // console.log("DOb", age);
-
     return age;
   }
   handleOnChange = (event, index) => {
@@ -119,10 +212,16 @@ class Tab2 extends Component {
 
     console.log(this.state.Dependents);
   }
-  async onSubmit(e) {
-    e.preventDefault();
+  async onSubmit() {
+    var isDependant = await this.valdateDependent();
+    var isvalid = await this.validateOther();
+    console.log(isDependant, isvalid);
+    console.log(isDependant.length, isvalid.length);
+    console.log(this.state);
+    // console.log(this.state.Dependents);
+
     // await this.onAdd();
-    var state = this.state;
+    /*  var state = this.state;
     var data = {
       dependents: state.Dependents,
       EducationExp: state.EducationExp,
@@ -132,7 +231,7 @@ class Tab2 extends Component {
     };
     console.log(data);
     await AsyncStorage.setItem("DependentInfo", JSON.stringify(data));
-    this.props.navigation.navigate("Tab3");
+    this.props.navigation.navigate("Tab3"); */
   }
 
   DependentForm = () => {
@@ -147,6 +246,9 @@ class Tab2 extends Component {
             }}
             placeholder={"Name"}
           />
+          {item.nameErr ? (
+            <Text style={Style.error}>{item.nameErr}</Text>
+          ) : null}
           <View style={{ flexDirection: "row" }}>
             <View style={Style.picker}>
               <Picker
@@ -205,18 +307,25 @@ class Tab2 extends Component {
             }}
             onDateChange={(event) => this.onDateChange(event, index)}
           />
+          {item.dateErr ? (
+            <Text style={Style.error}>{item.dateErr}</Text>
+          ) : null}
           {this.getAge(this.state.Dependents[index].DOB) > 3 ? (
-            <TextInput
-              value={item.income}
-              onChangeText={(event) => this.handleIncome(event, index)}
-              placeholder={"Income"}
-              style={Style.input}
-              keyboardType={"numeric"}
-            />
+            <View>
+              <TextInput
+                value={item.income}
+                onChangeText={(event) => this.handleIncome(event, index)}
+                placeholder={"Income"}
+                style={Style.input}
+                keyboardType={"numeric"}
+              />
+              {item.incomeErr ? (
+                <Text style={Style.error}>{item.incomeErr}</Text>
+              ) : null}
+            </View>
           ) : (
             <View></View>
           )}
-          {}
 
           <View>
             <Text>Recommended for Counselling?</Text>
@@ -241,6 +350,7 @@ class Tab2 extends Component {
     });
   };
   render() {
+    const { EduErr, rentErr, incomeErr, utilErr } = this.state;
     const income = (
       <TextInput
         value={this.state.Dependents[0].income}
@@ -285,6 +395,7 @@ class Tab2 extends Component {
             style={Style.input}
             keyboardType={"numeric"}
           ></TextInput>
+          {rentErr ? <Text style={Style.error}>{rentErr}</Text> : null}
           <TextInput
             value={this.state.Utility}
             onChangeText={(Utility) => this.setState({ Utility })}
@@ -292,13 +403,15 @@ class Tab2 extends Component {
             style={Style.input}
             keyboardType={"numeric"}
           ></TextInput>
+          {utilErr ? <Text style={Style.error}>{utilErr}</Text> : null}
           <TextInput
-            value={this.state.Education}
-            onChangeText={(Education) => this.setState({ Education })}
+            value={this.state.EducationExp}
+            onChangeText={(EducationExp) => this.setState({ EducationExp })}
             placeholder={"Education Expense"}
             style={Style.input}
             keyboardType={"numeric"}
           ></TextInput>
+          {EduErr ? <Text style={Style.error}>{EduErr}</Text> : null}
           <TextInput
             value={this.state.OverallIncome}
             onChangeText={(OverallIncome) => this.setState({ OverallIncome })}
@@ -306,6 +419,7 @@ class Tab2 extends Component {
             style={Style.input}
             keyboardType={"numeric"}
           ></TextInput>
+          {incomeErr ? <Text style={Style.error}>{incomeErr}</Text> : null}
 
           <Button
             title={"submit"}

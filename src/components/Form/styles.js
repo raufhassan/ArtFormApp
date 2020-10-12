@@ -92,4 +92,17 @@ export default Style = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  Dropdown: {
+    width: wp("80%"),
+    height: hp("7%"),
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "black",
+    backgroundColor: "white",
+    borderRadius: 4,
+  },
+  error: {
+    color: "red",
+    marginBottom: 10,
+  },
 });
