@@ -18,7 +18,8 @@ import RadioForm from "react-native-simple-radio-button";
 import AsyncStorage from "@react-native-community/async-storage";
 import ImagePicker from "react-native-image-picker";
 import DropDownPicker from "react-native-dropdown-picker";
-
+import { useIsFocused } from "@react-navigation/native";
+// import MainFirst from "./Main";
 // import ValidationComponent from "react-native-form-validator";
 var db = openDatabase({ name: "UserDatabase.db" });
 
@@ -30,46 +31,88 @@ var radio_props = [
 export default class Tab1 extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      first_name: "",
-      fnameErr: "",
-      last_name: "",
-      lnameErr: "",
-      Religion: "",
-      ReligionErr: "",
-      date: "",
-      dateErr: "",
-      RelStatus: "",
-      RelErr: "",
-      cell: "",
-      cellErr: "",
-      Address: "",
-      AddressErr: "",
-      Town: "",
-      TownErr: "",
-      Area: "",
-      AreaErr: "",
-      profession: "",
-      professionErr: "",
-      empStatus: "",
-      empStatusErr: "",
-      MonthlyIncome: 0,
-      incomeErr: "",
-      skills: "",
-      zakat: 0,
-      gender: "",
-      genderErr: "",
-      guardian: "",
-      guardianErr: "",
-      filepath: {
-        data: "",
-        uri: "",
-      },
-      fileData: "",
-      fileUri: "",
-      cnicErr: "",
-    };
+    const data = this.props.info;
+    if (data) {
+      this.state = {
+        first_name: data.first_name,
+        fnameErr: "",
+        last_name: data.last_name,
+        lnameErr: "",
+        Religion: data.Religion,
+        ReligionErr: "",
+        date: data.date,
+        dateErr: "",
+        RelStatus: data.RelStatus,
+        RelErr: "",
+        cell: data.cell,
+        cellErr: "",
+        Address: data.Address,
+        AddressErr: "",
+        Town: data.Town,
+        TownErr: "",
+        Area: data.Area,
+        AreaErr: "",
+        profession: data.profession,
+        professionErr: "",
+        empStatus: data.empStatus,
+        empStatusErr: "",
+        MonthlyIncome: data.MonthlyIncome,
+        incomeErr: "",
+        skills: data.skills,
+        zakat: data.zakat,
+        gender: data.gender,
+        genderErr: "",
+        guardian: data.guardian,
+        guardianErr: "",
+        filepath: {
+          data: "",
+          uri: "",
+        },
+        fileData: "",
+        fileUri: data.cnic,
+        cnicErr: "",
+      };
+    } else {
+      this.state = {
+        first_name: "",
+        fnameErr: "",
+        last_name: "",
+        lnameErr: "",
+        Religion: "",
+        ReligionErr: "",
+        date: "",
+        dateErr: "",
+        RelStatus: "",
+        RelErr: "",
+        cell: "",
+        cellErr: "",
+        Address: "",
+        AddressErr: "",
+        Town: "",
+        TownErr: "",
+        Area: "",
+        AreaErr: "",
+        profession: "",
+        professionErr: "",
+        empStatus: "",
+        empStatusErr: "",
+        MonthlyIncome: "",
+        incomeErr: "",
+        skills: "",
+        zakat: 0,
+        gender: "",
+        genderErr: "",
+        guardian: "",
+        guardianErr: "",
+        filepath: {
+          data: "",
+          uri: "",
+        },
+        fileData: "",
+        fileUri: "",
+        cnicErr: "",
+      };
+    }
   }
 
   validate = () => {
@@ -205,35 +248,41 @@ export default class Tab1 extends Component {
   };
 
   async componentDidMount() {
-    try {
+    /*  try {
       const retrievedItem = await AsyncStorage.getItem("id");
       const item = JSON.parse(retrievedItem);
       console.log("data of async", item);
     } catch (error) {
       console.log(error.message);
-    }
+    } */
   }
   async onSubmit() {
     // e.preventDefault();
     var state = this.state;
-    console.log(state.fileUri);
+    // console.log(state.fileUri);
     var isValid = await this.validate();
-    console.log(isValid.length);
+    /*   console.log(isValid.length);
     console.log(isValid);
     console.log(typeof isValid.length);
     if (isValid.length === 0) {
       console.log("no error");
     } else {
       console.log("exist");
-    }
-    /* if (isValid.length == 0) {
+    } */
+    if (isValid.length === 0) {
       let personalInfo = {
         first_name: state.first_name,
         last_name: state.last_name,
         Religion: state.Religion,
+        zakat: state.zakat,
+        gender: state.gender,
+        guardian: state.guardian,
         date: state.date,
         RelStatus: state.RelStatus,
         cell: state.cell,
+        Address: state.Address,
+        Town: state.Town,
+        Area: state.Area,
         profession: state.profession,
         empStatus: state.empStatus,
         MonthlyIncome: state.MonthlyIncome,
@@ -241,11 +290,12 @@ export default class Tab1 extends Component {
         cnic: state.fileUri,
       };
       console.log(personalInfo);
-      await AsyncStorage.setItem("Personal", JSON.stringify(personalInfo));
-      this.props.navigation.navigate("Tab2");
+      // await AsyncStorage.setItem("Personal", JSON.stringify(personalInfo));
+      // this.props.navigation.navigate("Tab2");
+      this.props.personalInfo(personalInfo);
     } else {
       console.log(isValid);
-    } */
+    }
   }
   chooseImage = () => {
     let options = {
@@ -328,6 +378,9 @@ export default class Tab1 extends Component {
   }
 
   render() {
+    if (this.props.info) {
+      console.log("data", this.props.info);
+    }
     var {
       fnameErr,
       lnameErr,
@@ -347,6 +400,9 @@ export default class Tab1 extends Component {
     } = this.state;
     var { gender } = this.state;
     let input;
+    /*  let isFocused = this.props.navigation.isFocused();
+    console.log("tab1", isFocused); */
+
     const father = (
       <View>
         <TextInput
@@ -377,6 +433,7 @@ export default class Tab1 extends Component {
       input = null;
     }
     return (
+      // <MainFirst>
       <ScrollView style={Style.scrollContainer}>
         <View style={Style.container}>
           <Text style={Style.myText}> Personal Info</Text>
@@ -394,8 +451,8 @@ export default class Tab1 extends Component {
             style={Style.input}
           ></TextInput>
           {lnameErr ? <Text style={Style.error}>{lnameErr}</Text> : null}
-          <View style={{ marginBottom: 10 }}>
-            {/* <Picker
+          <View style={Style.picker}>
+            <Picker
               selectedValue={this.state.gender}
               style={Style.picker}
               onValueChange={(value) => {
@@ -409,8 +466,8 @@ export default class Tab1 extends Component {
               <Picker.Item label="select gender" value="-1" />
               <Picker.Item label="male" value="male" />
               <Picker.Item label="female" value="female" />
-            </Picker> */}
-            <DropDownPicker
+            </Picker>
+            {/*        <DropDownPicker
               items={[
                 { label: "male", value: "male" },
                 { label: "female", value: "female" },
@@ -419,25 +476,24 @@ export default class Tab1 extends Component {
               containerStyle={{ height: 40 }}
               style={Style.Dropdown}
               placeholder={"select gender"}
-              placeholderStyle={{
-                color: "grey",
-              }}
               itemStyle={{
                 justifyContent: "flex-start",
+                color: "red",
               }}
+              activeItemStyle={{ color: "red" }}
               dropDownStyle={{ backgroundColor: "#fafafa" }}
               onChangeItem={(item) =>
                 this.setState({
                   gender: item.value,
                 })
               }
-            />
+            /> */}
             {genderErr ? <Text style={Style.error}>{genderErr}</Text> : null}
           </View>
           {/* {this.state.gender === "male" ? father : husband} */}
           {input}
 
-          {/* <View style={Style.picker}>
+          <View style={Style.picker}>
             <Picker
               selectedValue={this.state.Religion}
               style={Style.picker}
@@ -456,8 +512,8 @@ export default class Tab1 extends Component {
               <Picker.Item label="jew" value="jew" />
               <Picker.Item label="other" value="other" />
             </Picker>
-          </View> */}
-          <DropDownPicker
+          </View>
+          {/*       <DropDownPicker
             items={[
               { label: "Islam", value: "Islam" },
               { label: "Christianity", value: "Christianity" },
@@ -465,13 +521,10 @@ export default class Tab1 extends Component {
               { label: "jew", value: "jew" },
               { label: "other", value: "other" },
             ]}
-            defaultValue={this.state.gender}
+            defaultValue={this.state.Religion}
             containerStyle={{ height: 40 }}
             style={Style.Dropdown}
             placeholder={"select Religion"}
-            placeholderStyle={{
-              color: "grey",
-            }}
             itemStyle={{
               justifyContent: "flex-start",
             }}
@@ -481,7 +534,7 @@ export default class Tab1 extends Component {
                 Religion: item.value,
               })
             }
-          />
+          /> */}
           {ReligionErr ? <Text style={Style.error}>{ReligionErr}</Text> : null}
           {this.state.Religion === "Islam" ? (
             <View>
@@ -524,7 +577,27 @@ export default class Tab1 extends Component {
             }}
           />
           {dateErr ? <Text style={Style.error}>{dateErr}</Text> : null}
-          <View style={{ marginBottom: 10 }}>
+          <View style={Style.picker}>
+            <Picker
+              selectedValue={this.state.RelStatus}
+              style={Style.picker}
+              onValueChange={(value) => {
+                if (value === " -1") {
+                  this.setState({ RelStatus: "" });
+                } else {
+                  this.setState({ RelStatus: value });
+                }
+              }}
+            >
+              <Picker.Item label="Relationship status" value="-1" />
+              <Picker.Item label="Single" value="Single" />
+              <Picker.Item label="Married" value="Married" />
+              <Picker.Item label="Widow" value="Widow" />
+              <Picker.Item label="Widower" value="Widower" />
+              <Picker.Item label="Seperated" value="Seperated" />
+            </Picker>
+          </View>
+          {/*   <View style={{ marginBottom: 10 }}>
             <DropDownPicker
               items={[
                 { label: "Single", value: "Single" },
@@ -533,13 +606,12 @@ export default class Tab1 extends Component {
                 { label: "Widower", value: "Widower" },
                 { label: "Seperated", value: "Seperated" },
               ]}
-              defaultValue={this.state.gender}
+              defaultValue={this.state.RelStatus}
               containerStyle={{ height: 40 }}
               style={Style.Dropdown}
               placeholder={"select Relationship status"}
-              placeholderStyle={{
-                color: "grey",
-              }}
+            
+
               itemStyle={{
                 justifyContent: "flex-start",
               }}
@@ -550,7 +622,7 @@ export default class Tab1 extends Component {
                 })
               }
             />
-          </View>
+          </View> */}
           {RelErr ? <Text style={Style.error}>{RelErr}</Text> : null}
           <TextInput
             value={this.state.cell}
@@ -567,7 +639,7 @@ export default class Tab1 extends Component {
             style={Style.input}
           ></TextInput>
           {AddressErr ? <Text style={Style.error}>{AddressErr}</Text> : null}
-          {/*    <View style={Style.picker}>
+          <View style={Style.picker}>
             <Picker
               selectedValue={this.state.Town}
               style={Style.picker}
@@ -586,8 +658,8 @@ export default class Tab1 extends Component {
               <Picker.Item label="Korangi" value="Korangi" />
               <Picker.Item label="others" value="others" />
             </Picker>
-          </View> */}
-          <View style={{ marginBottom: 10 }}>
+          </View>
+          {/*  <View style={{ marginBottom: 10 }}>
             <DropDownPicker
               items={[
                 { label: "Surjani", value: "Surjani" },
@@ -596,13 +668,10 @@ export default class Tab1 extends Component {
                 { label: "Korangi", value: "Korangi" },
                 { label: "others", value: "others" },
               ]}
-              defaultValue={this.state.gender}
+              defaultValue={this.state.Town}
               containerStyle={{ height: 40 }}
               style={Style.Dropdown}
               placeholder={"select Town"}
-              placeholderStyle={{
-                color: "grey",
-              }}
               itemStyle={{
                 justifyContent: "flex-start",
               }}
@@ -613,7 +682,7 @@ export default class Tab1 extends Component {
                 })
               }
             />
-          </View>
+          </View> */}
           {TownErr ? <Text style={Style.error}>{TownErr}</Text> : null}
           <TextInput
             value={this.state.Area}
@@ -622,7 +691,7 @@ export default class Tab1 extends Component {
             style={Style.input}
           ></TextInput>
           {AreaErr ? <Text style={Style.error}>{AreaErr}</Text> : null}
-          {/*     <View style={Style.picker}>
+          <View style={Style.picker}>
             <Picker
               selectedValue={this.state.profession}
               style={Style.picker}
@@ -640,8 +709,8 @@ export default class Tab1 extends Component {
               <Picker.Item label="Labor/Daily wage worker" value="Labor" />
               <Picker.Item label="Others" value="Others" />
             </Picker>
-          </View> */}
-          <View style={{ marginBottom: 10 }}>
+          </View>
+          {/* <View style={{ marginBottom: 10 }}>
             <DropDownPicker
               items={[
                 { label: "Driver", value: "Driver" },
@@ -650,13 +719,10 @@ export default class Tab1 extends Component {
                 { label: "Labor/Daily wage worker", value: "Labor" },
                 { label: "Others", value: "others" },
               ]}
-              defaultValue={this.state.gender}
+              defaultValue={this.state.profession}
               containerStyle={{ height: 40 }}
               style={Style.Dropdown}
               placeholder={"select Profession"}
-              placeholderStyle={{
-                color: "grey",
-              }}
               itemStyle={{
                 justifyContent: "flex-start",
               }}
@@ -667,7 +733,7 @@ export default class Tab1 extends Component {
                 })
               }
             />
-          </View>
+          </View> */}
           {professionErr ? (
             <Text style={Style.error}>{professionErr}</Text>
           ) : null}
@@ -689,6 +755,28 @@ export default class Tab1 extends Component {
               <Picker.Item label="self-employed" value="Self-employed" />
             </Picker>
           </View>
+          {/*  <View style={{ marginBottom: 10 }}>
+            <DropDownPicker
+              items={[
+                { label: "Employed", value: "Employed" },
+                { label: "Unemployed", value: "Unemployed" },
+                { label: "self-employed", value: "self-employed" },
+              ]}
+              defaultValue={this.state.empStatus}
+              containerStyle={{ height: 40 }}
+              style={Style.Dropdown}
+              placeholder={"Select Employement status"}
+              itemStyle={{
+                justifyContent: "flex-start",
+              }}
+              dropDownStyle={{ backgroundColor: "#fafafa" }}
+              onChangeItem={(item) =>
+                this.setState({
+                  empStatus: item.value,
+                })
+              }
+            />
+          </View> */}
           {empStatusErr ? (
             <Text style={Style.error}>{empStatusErr}</Text>
           ) : null}
@@ -725,6 +813,7 @@ export default class Tab1 extends Component {
           <Text></Text>
         </View>
       </ScrollView>
+      // </MainFirst>
     );
   }
 }

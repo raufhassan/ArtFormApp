@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { View, Text, TouchableOpacity, Button, TextInput } from "react-native";
 import Style from "./style";
 import AsyncStorage from "@react-native-community/async-storage";
+import { openDatabase } from "react-native-sqlite-storage";
+var db = openDatabase({ name: "UserDatabase.db" });
 
 export default class Form extends Component {
   constructor(props) {
@@ -16,8 +18,9 @@ export default class Form extends Component {
   async onSubmit(e) {
     e.preventDefault();
     var userId = this.state.id;
-    await AsyncStorage.setItem("id", userId);
-    this.props.navigation.navigate("Tab1");
+    this.props.saveID(userId);
+    /* await AsyncStorage.setItem("id", userId);
+    this.props.navigation.navigate("Tab1"); */
   }
 
   async componentDidMount() {
@@ -26,7 +29,7 @@ export default class Form extends Component {
     } else {
       console.log("enter id");
     } */
-    try {
+    /*     try {
       var value = await AsyncStorage.getItem("id");
       if (value !== "") {
         // We have data!!
@@ -36,7 +39,7 @@ export default class Form extends Component {
     } catch (error) {
       // Error retrieving data
       console.log("enter user id");
-    }
+    } */
   }
 
   // componentDidUpdate(prevProps, prevState, snapshot) {
@@ -56,6 +59,9 @@ export default class Form extends Component {
   // };
 
   render() {
+    // console.log(this.props.navigation.state);
+    // let isFocused = this.props.navigation.isFocused();
+    // console.log("home", isFocused);
     return (
       <View style={Style.container}>
         <Text style={Style.myText}>Enter User ID</Text>

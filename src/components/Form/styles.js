@@ -54,6 +54,8 @@ export default Style = StyleSheet.create({
     padding: 10,
     backgroundColor: "#fff",
     marginBottom: 10,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -94,8 +96,8 @@ export default Style = StyleSheet.create({
   },
   Dropdown: {
     width: wp("80%"),
-    height: hp("7%"),
-    padding: 10,
+    /* height: hp("15%"),
+    padding: 15, */
     borderWidth: 1,
     borderColor: "black",
     backgroundColor: "white",

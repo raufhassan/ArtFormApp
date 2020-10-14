@@ -15,6 +15,7 @@ import Style from "../styles";
 import DatePicker from "react-native-datepicker";
 import RadioForm from "react-native-simple-radio-button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 
 var radio_props = [
@@ -24,59 +25,96 @@ var radio_props = [
 class Tab2 extends Component {
   constructor(props) {
     super(props);
+    const data = this.props.info;
+    if (data) {
+      this.state = {
+        Dependents: data.dependents,
 
-    this.state = {
-      Dependents: [
-        {
-          name: "",
-          nameErr: "",
-          DOB: "",
-          dateErr: "",
-          income: "",
-          incomeErr: "",
-          Relation: "",
-          Education: "",
-          councelling: 0,
-          EducationSupport: 0,
-          age: null,
-        },
-      ],
-      DepArray: {
-        name: "",
-        DOB: "",
-        income: "",
-        Relation: "",
-        Education: "",
-        councelling: 0,
-        EducationSupport: 0,
-      },
-      EducationExp: "",
-      EduErr: "",
-      OverallIncome: "",
-      incomeErr: "",
-      Rent: "",
-      rentErr: "",
-      Utility: "",
-      utilErr: "",
-      error: "",
-    };
+        EducationExp: data.EducationExp,
+        EduErr: "",
+        OverallIncome: data.OverallIncome,
+        incomeErr: "",
+        Rent: data.Rent,
+        rentErr: "",
+        Utility: data.Utility,
+        utilErr: "",
+      };
+    } else {
+      this.state = {
+        Dependents: [
+          {
+            name: "",
+            nameErr: "",
+            DOB: "",
+            dateErr: "",
+            income: "",
+            incomeErr: "",
+            Relation: "",
+            RelationErr: "",
+            Education: "",
+            EducationErr: "",
+            councelling: 0,
+            EducationSupport: 0,
+            age: null,
+          },
+        ],
+
+        EducationExp: "",
+        EduErr: "",
+        OverallIncome: "",
+        incomeErr: "",
+        Rent: "",
+        rentErr: "",
+        Utility: "",
+        utilErr: "",
+      };
+    }
     this.onAdd = this.onAdd.bind(this);
     // this.handleOnChange = this.handleOnChange.bind(this);
   }
 
-  componentDidMount() {}
+  async componentDidMount() {
+    console.log(this.props.info.dependents);
+    /* try {
+      const retrievedItem = await AsyncStorage.getItem("Personal");
+      const item = JSON.parse(retrievedItem);
+      console.log("data of async", item);
+    } catch (error) {
+      console.log(error.message);
+    } */
+  }
   valdateDependent = () => {
     // let isvalid;
     var error = [];
     this.state.Dependents.map((item, index) => {
       if (item.name === "") {
         var data = this.state.Dependents;
-        data[index].nameErr = "Dependent name is empty";
+        data[index].nameErr = "Dependent's name is empty";
         this.setState({ Dependents: data });
         error.push("err");
       } else {
         var data = this.state.Dependents;
         data[index].nameErr = "";
+        this.setState({ Dependents: data });
+      }
+      if (item.Relation === "") {
+        var data = this.state.Dependents;
+        data[index].RelationErr = "Dependent's Relation is empty";
+        this.setState({ Dependents: data });
+        error.push("err");
+      } else {
+        var data = this.state.Dependents;
+        data[index].RelationErr = "";
+        this.setState({ Dependents: data });
+      }
+      if (item.Education === "") {
+        var data = this.state.Dependents;
+        data[index].EducationErr = "Dependent's Education is empty";
+        this.setState({ Dependents: data });
+        error.push("err");
+      } else {
+        var data = this.state.Dependents;
+        data[index].EducationErr = "";
         this.setState({ Dependents: data });
       }
       if (item.DOB === "") {
@@ -99,28 +137,7 @@ class Tab2 extends Component {
         data[index].incomeErr = "";
         this.setState({ Dependents: data });
       }
-
-      /*    if (item.DOB !== "") {
-        var data = this.state.Dependents;
-        data[index].dateErr = "";
-        this.setState({ Dependents: data });
-      }
-      if (item.DOB !== "") {
-        var data = this.state.Dependents;
-        data[index].dateErr = "";
-        this.setState({ Dependents: data });
-      } */
-
-      /*   if(item.Relation===""){
-        this.setState({error:"Dependent DOB is empty"});
-        return false
-      }
-      if(item.Education===""){
-        this.setState({error:"Dependent DOB is empty"});
-        return false
-      } */
     });
-    // return isvalid.every((x) => x === true);
     return error;
   };
   validateOther = () => {
@@ -152,6 +169,22 @@ class Tab2 extends Component {
     }
     return errors;
   };
+
+  getDepArray() {
+    var dependents = this.state.Dependents.map((item) => {
+      return {
+        name: item.name,
+        DOB: item.DOB,
+        income: item.income,
+        Relation: item.Relation,
+        Education: item.Education,
+        councelling: item.councelling,
+        EducationSupport: item.EducationSupport,
+        age: null,
+      };
+    });
+    return dependents;
+  }
 
   getAge(DOB) {
     var today = new Date();
@@ -206,18 +239,47 @@ class Tab2 extends Component {
   };
 
   onAdd() {
+    const DepArray = {
+      name: "",
+      nameErr: "",
+      DOB: "",
+      dateErr: "",
+      income: "",
+      incomeErr: "",
+      Relation: "",
+      RelationErr: "",
+      Education: "",
+      EducationErr: "",
+      councelling: 0,
+      EducationSupport: 0,
+      age: null,
+    };
     var data = this.state.Dependents;
-    data.push(this.state.DepArray);
+    data.push(DepArray);
     this.setState({ Dependents: data });
 
-    console.log(this.state.Dependents);
+    // console.log(this.state.Dependents);
   }
   async onSubmit() {
     var isDependant = await this.valdateDependent();
     var isvalid = await this.validateOther();
-    console.log(isDependant, isvalid);
-    console.log(isDependant.length, isvalid.length);
-    console.log(this.state);
+    if (isvalid.length === 0 && isDependant.length === 0) {
+      // console.log(this.getDepArray());
+      var data = {
+        dependents: this.getDepArray(),
+        EducationExp: this.state.EducationExp,
+        OverallIncome: this.state.OverallIncome,
+        Rent: this.state.Rent,
+        Utility: this.state.Utility,
+      };
+      console.log(data);
+      this.props.DependentInfo(data);
+      /* await AsyncStorage.setItem("DependentInfo", JSON.stringify(data));
+      this.props.navigation.navigate("Tab3"); */
+    }
+    // console.log(isDependant, isvalid);
+    // console.log(isDependant.length, isvalid.length);
+    // console.log(this.state);
     // console.log(this.state.Dependents);
 
     // await this.onAdd();
@@ -254,8 +316,13 @@ class Tab2 extends Component {
               <Picker
                 selectedValue={item.Relation}
                 style={Style.picker}
-                onValueChange={(event) => this.handleRelChange(event, index)}
+                onValueChange={(event) => {
+                  if (event !== "-1") {
+                    this.handleRelChange(event, index);
+                  }
+                }}
               >
+                <Picker.Item label="Relation" value="-1" />
                 <Picker.Item label="Mother" value="Mother" />
                 <Picker.Item label="Son" value="Son" />
                 <Picker.Item label="Wife" value="Wife" />
@@ -267,13 +334,21 @@ class Tab2 extends Component {
               </Picker>
             </View>
           </View>
+          {item.RelationErr ? (
+            <Text style={Style.error}>{item.RelationErr}</Text>
+          ) : null}
 
           <View style={Style.picker}>
             <Picker
               selectedValue={item.Education}
               style={Style.picker}
-              onValueChange={(event) => this.handleEdChange(event, index)}
+              onValueChange={(event) => {
+                if (event !== "-1") {
+                  this.handleEdChange(event, index);
+                }
+              }}
             >
+              <Picker.Item label="Education" value="-1" />
               <Picker.Item label="Below Matric" value="Below Matric" />
               <Picker.Item label="Matric" value="Matric" />
               <Picker.Item label="Intermediate" value="Intermediate" />
@@ -281,7 +356,9 @@ class Tab2 extends Component {
               <Picker.Item label="Master" value="Masters" />
             </Picker>
           </View>
-
+          {item.EducationErr ? (
+            <Text style={Style.error}>{item.EducationErr}</Text>
+          ) : null}
           <DatePicker
             style={Style.Date}
             date={item.DOB}
@@ -351,15 +428,7 @@ class Tab2 extends Component {
   };
   render() {
     const { EduErr, rentErr, incomeErr, utilErr } = this.state;
-    const income = (
-      <TextInput
-        value={this.state.Dependents[0].income}
-        onChangeText={this.handleIncome}
-        placeholder={"Income"}
-        style={Style.input}
-        keyboardType={"numeric"}
-      />
-    );
+
     // var age = this.getAge(this.state.Dependents[0].DOB);
     // const goodbyeMessage = <Text> Goodbye, JSX! </Text>;
 

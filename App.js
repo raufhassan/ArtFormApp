@@ -7,18 +7,33 @@
  */
 
 import React from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from "react-native";
+import { Provider } from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import AsyncStorage from "@react-native-community/async-storage";
+import rootReducer from "./redux/reducers";
+import { persistStore, persistReducer } from "redux-persist";
+import logger from "redux-logger";
 import Routes from "./src/routes/index";
+import Main from "./src/components/Main";
+import { PersistGate } from "redux-persist/es/integration/react";
 
+const persistConfig = {
+  key: "root",
+  storage: AsyncStorage,
+  // Whitelist:['user']
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+const store = createStore(persistedReducer, applyMiddleware(logger));
+const persistedStore = persistStore(store);
 const App = () => {
-  return <Routes />;
+  return (
+    <Provider store={store}>
+      <PersistGate persistor={persistedStore} loading={null}>
+        <Main />
+      </PersistGate>
+    </Provider>
+  );
 };
 
 export default App;

@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { View, Text, TouchableOpacity, Button, TextInput } from "react-native";
 import Style from "./styles";
 import AsyncStorage from "@react-native-community/async-storage";
+import { openDatabase } from "react-native-sqlite-storage";
+var db = openDatabase({ name: "UserDatabase.db" });
 
 export default class Form extends Component {
   constructor(props) {
@@ -10,13 +12,36 @@ export default class Form extends Component {
     this.state = {
       id: "",
     };
+    db.transaction(function (txn) {
+      txn.executeSql(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='table_user'",
+        [],
+        function (tx, res) {
+          console.log("item:", res.rows.length);
+          if (res.rows.length == 0) {
+            txn.executeSql("DROP TABLE IF EXISTS table_user", []);
+            txn.executeSql("PRAGMA foreign_keys=on");
+            txn.executeSql(
+              "CREATE TABLE IF NOT EXISTS [user](user_id INTEGER  NOT NULL PRIMARY KEY , first_name VARCHAR(50)  NULL,[last_name] ,VARCHAR(50)  NULL,[Gender] VARCHAR(50)  NULL,Religion VARCHAR(20),Zakat INTEGER, DOB VARCHAR(20) , Marital_status VARCHAR(20),cell VARCHAR(20), Address VARCHAR(20), Town VARCHAR(20),Area VARCHAR(20), Profession VARCHAR(20), Employement_status VARCHAR(20), Monthly_income VARCHAR(20), Skills VARCHAR(20) NULL  )"
+            );
+            // txn.executeSql(
+            //   "CREATE TABLE IF NOT EXISTS [dependent] ([StudentId] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,[StudentName] NVARCHAR(50)  NULL,[isPresent] NVARCHAR(50) DEFAULT false NOT NULL,[ClassId] INTEGER  NOT NULL,FOREIGN KEY(ClassId) REFERENCES Class(ClassId))"
+            // );
+            // txn.executeSql(
+            //   "CREATE TABLE IF NOT EXISTS table_user(user_id INTEGER PRIMARY KEY AUTOINCREMENT, user_name VARCHAR(20), user_contact INT(10), user_email VARCHAR(20))",
+            //   []
+            // );
+          }
+        }
+      );
+    });
 
     // this.handleEvent = this.handleEvent.bind(this);
   }
   async onSubmit(e) {
     e.preventDefault();
     var userId = this.state.id;
-    await AsyncStorage.setItem("id", userId);
+    await AsyncStorage.getItem("id", userId);
     this.props.navigation.navigate("Tab1");
   }
 
