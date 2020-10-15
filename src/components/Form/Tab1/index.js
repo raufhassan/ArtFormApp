@@ -19,9 +19,9 @@ import AsyncStorage from "@react-native-community/async-storage";
 import ImagePicker from "react-native-image-picker";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useIsFocused } from "@react-navigation/native";
+import { Husband } from "./husband";
 // import MainFirst from "./Main";
 // import ValidationComponent from "react-native-form-validator";
-var db = openDatabase({ name: "UserDatabase.db" });
 
 var radio_props = [
   { label: "no  ", value: 0 },
@@ -61,6 +61,17 @@ export default class Tab1 extends Component {
         skills: data.skills,
         zakat: data.zakat,
         gender: data.gender,
+        HbState: "",
+        HbStateErr: "",
+        Hbprofession: "",
+        HbprofessionErr: "",
+        Hbincome: "",
+        HbincomeErr: "",
+        HbUnemp: "",
+        HbUnempErr: "",
+        Hbcompany: "",
+        HbReason: "",
+        HbReasonErr: "",
         genderErr: "",
         guardian: data.guardian,
         guardianErr: "",
@@ -101,7 +112,19 @@ export default class Tab1 extends Component {
         skills: "",
         zakat: 0,
         gender: "",
+        HbState: "",
+        HbStateErr: "",
+        Hbprofession: "",
+        HbprofessionErr: "",
+        Hbincome: "",
+        HbincomeErr: "",
+        HbUnemp: "",
+        HbUnempErr: "",
+        Hbcompany: "",
+        HbReason: "",
+        HbReasonErr: "",
         genderErr: "",
+        husbandState: "",
         guardian: "",
         guardianErr: "",
         filepath: {
@@ -134,6 +157,11 @@ export default class Tab1 extends Component {
       empStatus,
       MonthlyIncome,
       gender,
+      HbState,
+      Hbprofession,
+      Hbincome,
+      HbUnemp,
+      HbReason,
     } = this.state;
     if (first_name !== "") {
       if (first_name.length < 3) {
@@ -242,6 +270,46 @@ export default class Tab1 extends Component {
       errors.push("imageerror");
     } else {
       this.setState({ cnicErr: "" });
+    }
+    if (gender === "female" && RelStatus === "Married") {
+      if (HbState === "") {
+        this.setState({
+          HbStateErr: "Husband employement status field is empty",
+        });
+        errors.push("error");
+      } else {
+        this.setState({ HbStateErr: "" });
+      }
+    }
+    if (HbState === "Employed" && Hbincome === "") {
+      this.setState({ HbincomeErr: "husbands income empty" });
+      errors.push("income err");
+    } else {
+      this.setState({ HbincomeErr: "" });
+    }
+    if (HbState === "Employed" && Hbprofession === "") {
+      this.setState({ HbprofessionErr: "husbands profession is empty" });
+      errors.push("profession err");
+    } else {
+      this.setState({ HbprofessionErr: "" });
+    }
+    if (HbState === "Unemployed" && HbUnemp === "") {
+      this.setState({ HbUnempErr: "unemployement type is empty" });
+      errors.push("unemp err");
+    } else {
+      this.setState({ HbUnempErr: "" });
+    }
+    if (HbUnemp === "Permenant" && Hbprofession === "") {
+      this.setState({ HbprofessionErr: "husbands profession is empty" });
+      errors.push("unemp err");
+    } else {
+      this.setState({ HbprofessionErr: "" });
+    }
+    if (HbUnemp === "Temporary" && HbReason === "") {
+      this.setState({ HbReasonErr: "Unemployement reason is empty is empty" });
+      errors.push("unemp err");
+    } else {
+      this.setState({ HbReasonErr: "" });
     }
 
     return errors;
@@ -376,11 +444,34 @@ export default class Tab1 extends Component {
         /> */
     }
   }
+  onStatusChange = (value) => {
+    if (value === "-1") {
+      this.setState({ HbState: "" });
+    } else {
+      this.setState({ HbState: value });
+    }
+  };
+  onProfessionChange = (value) => {
+    this.setState({ Hbprofession: value });
+  };
+  onIncomeChange = (value) => {
+    this.setState({ Hbincome: value });
+  };
+  onCompanyChange = (value) => {
+    this.setState({ Hbcompany: value });
+  };
+  onReasonChange = (value) => {
+    this.setState({ HbReason: value });
+  };
+  onUnEmpChange = (value) => {
+    this.setState({ HbUnemp: value });
+  };
 
   render() {
-    if (this.props.info) {
+    /* if (this.props.info) {
       console.log("data", this.props.info);
-    }
+    } */
+    console.log(this.state);
     var {
       fnameErr,
       lnameErr,
@@ -398,10 +489,29 @@ export default class Tab1 extends Component {
       professionErr,
       cnicErr,
     } = this.state;
-    var { gender } = this.state;
-    let input;
+
+    var { gender, RelStatus } = this.state;
+    let input, husbandStatus;
     /*  let isFocused = this.props.navigation.isFocused();
     console.log("tab1", isFocused); */
+    if (gender === "female" && RelStatus === "Married") {
+      husbandStatus = (
+        <Husband
+          data={this.state}
+          husbandState={this.state.HbState}
+          company={this.state.Hbcompany}
+          income={this.state.Hbincome}
+          profession={this.state.Hbprofession}
+          reason={this.state.HbReason}
+          onStatusChange={this.onStatusChange}
+          onProfessionChange={this.onProfessionChange}
+          onIncomeChange={this.onIncomeChange}
+          onCompanyChange={this.onCompanyChange}
+          onReasonChange={this.onReasonChange}
+          onUnEmpChange={this.onUnEmpChange}
+        />
+      );
+    }
 
     const father = (
       <View>
@@ -597,6 +707,7 @@ export default class Tab1 extends Component {
               <Picker.Item label="Seperated" value="Seperated" />
             </Picker>
           </View>
+          {husbandStatus}
           {/*   <View style={{ marginBottom: 10 }}>
             <DropDownPicker
               items={[

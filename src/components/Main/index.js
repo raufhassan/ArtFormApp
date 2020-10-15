@@ -7,6 +7,7 @@ import Tab2 from "../Form/Tab2";
 import Tab3 from "../Form/Tab3";
 import MainFirst from "../Form/Tab1/Main";
 import MainSecond from "../Form/Tab2/Main";
+import MainThird from "../Form/Tab3/Main";
 const Stack = createStackNavigator();
 export default class Main extends Component {
   constructor(props) {
@@ -29,7 +30,7 @@ export default class Main extends Component {
           />
           <Stack.Screen name="Tab1" component={MainFirst} />
           <Stack.Screen name="Tab2" component={MainSecond} />
-          <Stack.Screen name="Tab3" component={Tab3} />
+          <Stack.Screen name="Tab3" component={MainThird} />
         </Stack.Navigator>
       </NavigationContainer>
     );

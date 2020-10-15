@@ -9,6 +9,7 @@ import {
   ScrollView,
   Button,
   Image,
+  SafeAreaView,
 } from "react-native";
 import Style from "../styles";
 import RadioForm from "react-native-simple-radio-button";
@@ -21,7 +22,7 @@ const options = ["Ration", "Education ", "Small Business Support", "Health"];
 
 var radio_props = [
   { label: "Most deserving", value: "Most deserving" },
-  { label: "deserving ", value: 1 },
+  { label: "deserving ", value: "deserving" },
   { label: "Not deserving ", value: "Not deserving" },
   { label: "Temporarily relief ", value: "Temporarily relief" },
 ];
@@ -29,38 +30,52 @@ var radio_props = [
 export default class Tab3 extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      familyIs: "",
-      selectedFor: [],
-      typeErr: "",
-      disease: "",
-      diseaseErr: "",
-      Remarks: "",
-      RemarksErr: "",
-      imagesUri: [],
-      imageErr: "",
-    };
+    const data = this.props.info;
+    if (data) {
+      this.state = {
+        familyIs: data.familyIs,
+        selectedFor: ["Ration"],
+        typeErr: "",
+        disease: data.disease,
+        diseaseErr: "",
+        Remarks: data.Remarks,
+        RemarksErr: "",
+        imagesUri: data.imagesUri,
+        imageErr: "",
+      };
+    } else {
+      this.state = {
+        familyIs: "",
+        selectedFor: [],
+        typeErr: "",
+        disease: "",
+        diseaseErr: "",
+        Remarks: "",
+        RemarksErr: "",
+        imagesUri: [],
+        imageErr: "",
+      };
+    }
   }
-  onSelectionsChange = (selectedFor) => {
+  onSelectionsChange = (value) => {
     // selectedFruits is array of { label, value }
-    this.setState({ selectedFor });
+    this.setState({ selectedFor: value });
   };
   async componentDidMount() {
-    try {
+    /* try {
       const retrievedItem = await AsyncStorage.getItem("DependentInfo");
       const item = JSON.parse(retrievedItem);
       console.log("data of async", item);
     } catch (error) {
       console.log(error.message);
-    }
+    } */
   }
   validate = () => {
     var errors = [];
     const { selectedFor, disease, Remarks, imagesUri } = this.state;
     var count = 0;
     this.state.selectedFor.map((item) => {
-      if (item.value === "Health") {
+      if (item === "Health") {
         count = count + 1;
       }
     });
@@ -128,7 +143,7 @@ export default class Tab3 extends Component {
   onHealth = () => {
     var count = 0;
     this.state.selectedFor.map((item) => {
-      if (item.value === "Health") {
+      if (item === "Health") {
         count = count + 1;
       }
     });
@@ -166,10 +181,21 @@ export default class Tab3 extends Component {
     }
   };
   onSubmit() {
+    console.log(this.state);
     // e.preventDefault(e);
-    isValid = this.validate();
+    var isValid = this.validate();
     console.log(isValid);
     console.log(isValid.length);
+    if (isValid.length === 0) {
+      const remarks = {
+        familyIs: this.state.familyIs,
+        selectedFor: this.state.selectedFor,
+        disease: this.state.disease,
+        Remarks: this.state.Remarks,
+        imagesUri: this.state.imagesUri,
+      };
+      this.props.Remarks(remarks);
+    }
   }
 
   render() {
@@ -192,11 +218,48 @@ export default class Tab3 extends Component {
           <View>
             <Text style={Style.label}>Family registered for</Text>
 
-            <SelectMultiple
+            {/* <SelectMultiple
               items={options}
               selectedItems={this.state.selectedFor}
-              onSelectionsChange={this.onSelectionsChange}
-            />
+              onSelectionsChange={(value) => this.onSelectionsChange(value)}
+            /> */}
+            <View style={{ marginVertical: 10 }}>
+              <DropDownPicker
+                items={[
+                  {
+                    label: "Ration",
+                    value: "Ration",
+                  },
+                  {
+                    label: "Education",
+                    value: "Education",
+                  },
+                  {
+                    label: "Small Business support",
+                    value: "business",
+                  },
+                  {
+                    label: "Health",
+                    value: "Health",
+                  },
+                ]}
+                multiple={true}
+                multipleText="%d items have been selected."
+                placeholder={"select registration type"}
+                min={0}
+                max={10}
+                defaultValue={this.state.selectedFor}
+                containerStyle={{ height: 40 }}
+                itemStyle={{
+                  justifyContent: "flex-start",
+                }}
+                onChangeItem={(item) =>
+                  this.setState({
+                    selectedFor: item, // an array of the selected items
+                  })
+                }
+              />
+            </View>
           </View>
           {typeErr ? <Text style={Style.error}>{typeErr}</Text> : null}
 
@@ -221,7 +284,6 @@ export default class Tab3 extends Component {
             <Text style={{ color: "#fff" }}>upload images</Text>
           </TouchableOpacity>
           {imageErr ? <Text style={Style.error}>{imageErr}</Text> : null}
-
           <ScrollView horizontal>
             <View style={{ flex: 1, flexDirection: "row" }}>
               {this.state.imagesUri

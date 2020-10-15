@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { View, Text, TouchableOpacity, Button, TextInput } from "react-native";
 import Style from "./style";
 import AsyncStorage from "@react-native-community/async-storage";
-import { openDatabase } from "react-native-sqlite-storage";
-var db = openDatabase({ name: "UserDatabase.db" });
+import user from "../../../redux/reducers/user";
 
 export default class Form extends Component {
   constructor(props) {
@@ -15,10 +14,25 @@ export default class Form extends Component {
 
     // this.handleEvent = this.handleEvent.bind(this);
   }
-  async onSubmit(e) {
-    e.preventDefault();
+  componentDidMount() {}
+  onSubmit() {
+    var data;
     var userId = this.state.id;
-    this.props.saveID(userId);
+    // this.props.saveID(userId);
+    data = {
+      id: this.setState.id,
+      name: "hassan",
+      contact: parseInt("37647324"),
+      email: "raufhassan41@gmail.com",
+    };
+    this.props.insertUser(data);
+    // this.props.saveID(userId);
+
+    console.log(userId);
+    // this.props.insertUser(data);
+    // this.props.saveID(userId);
+    // console.log(data);
+
     /* await AsyncStorage.setItem("id", userId);
     this.props.navigation.navigate("Tab1"); */
   }
@@ -67,7 +81,7 @@ export default class Form extends Component {
         <Text style={Style.myText}>Enter User ID</Text>
         <TextInput
           value={String(this.state.id)}
-          onChangeText={(id) => this.setState({ id })}
+          onChangeText={(value) => this.setState({ id: parseInt(value) })}
           placeholder={"User Id"}
           style={Style.input}
         ></TextInput>
