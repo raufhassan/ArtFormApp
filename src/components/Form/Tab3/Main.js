@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import Tab3 from "./index";
-import { Remarks } from "../../../../redux/actions/userActions";
+import {
+  Remarks,
+  insertUser,
+  insertDependents,
+} from "../../../../redux/actions/userActions";
 import { connect } from "react-redux";
 class MainThird extends Component {
   constructor(props) {
@@ -12,17 +16,30 @@ class MainThird extends Component {
   componentDidMount() {}
 
   render() {
-    var info;
+    var personalInfo, dependentInfo, remarks, userID;
     if (this.props.user.remarks) {
-      info = this.props.user.remarks;
+      remarks = this.props.user.remarks;
     }
-    console.log(info);
+    if (this.props.user.dependent) {
+      dependentInfo = this.props.user.dependent;
+    }
+    if (this.props.user.user) {
+      personalInfo = this.props.user.user;
+    }
+    if (this.props.user.id) {
+      userID = this.props.user.id;
+    }
     return (
       <>
         <Tab3
           navigation={this.props.navigation}
           Remarks={this.props.Remarks}
-          info={info}
+          insertUser={this.props.insertUser}
+          insertDependents={this.props.insertDependents}
+          info={remarks}
+          personalInfo={personalInfo}
+          dependentInfo={dependentInfo}
+          userID={userID}
         />
       </>
     );
@@ -31,4 +48,8 @@ class MainThird extends Component {
 const mapStateToProps = (state) => ({
   user: state.user,
 });
-export default connect(mapStateToProps, { Remarks })(MainThird);
+export default connect(mapStateToProps, {
+  Remarks,
+  insertUser,
+  insertDependents,
+})(MainThird);

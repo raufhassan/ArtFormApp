@@ -4,6 +4,7 @@ import {
   GET_ID,
   GET_DEPENDENTS,
   GET_REMARKS,
+  REMOVE_DATA,
 } from "../actions/types";
 
 const initialState = {
@@ -35,6 +36,14 @@ export default function (state = initialState, action) {
       return {
         ...state,
         remarks: action.payload,
+      };
+    case REMOVE_DATA:
+      return {
+        ...state,
+        id: null,
+        user: {},
+        dependent: {},
+        remarks: {},
       };
     default:
       return state;

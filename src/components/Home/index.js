@@ -16,19 +16,19 @@ export default class Form extends Component {
   }
   componentDidMount() {}
   onSubmit() {
-    var data;
+    // var data;
     var userId = this.state.id;
     // this.props.saveID(userId);
-    data = {
+    /* data = {
       id: this.setState.id,
       name: "hassan",
       contact: parseInt("37647324"),
       email: "raufhassan41@gmail.com",
-    };
-    this.props.insertUser(data);
-    // this.props.saveID(userId);
-
-    console.log(userId);
+    }; */
+    // this.props.insertUser(data);
+    this.props.saveID(parseInt(userId));
+    this.props.navigation.navigate("Tab1");
+    // console.log(userId);
     // this.props.insertUser(data);
     // this.props.saveID(userId);
     // console.log(data);
@@ -81,7 +81,7 @@ export default class Form extends Component {
         <Text style={Style.myText}>Enter User ID</Text>
         <TextInput
           value={String(this.state.id)}
-          onChangeText={(value) => this.setState({ id: parseInt(value) })}
+          onChangeText={(value) => this.setState({ id: value })}
           placeholder={"User Id"}
           style={Style.input}
         ></TextInput>

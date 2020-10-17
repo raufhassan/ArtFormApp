@@ -17,6 +17,8 @@ import SelectMultiple from "react-native-select-multiple";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 import ImagePicker from "react-native-image-crop-picker";
+import { openDatabase } from "react-native-sqlite-storage";
+var db = openDatabase({ name: "UserDatabase.db" });
 
 const options = ["Ration", "Education ", "Small Business Support", "Health"];
 
@@ -34,7 +36,7 @@ export default class Tab3 extends Component {
     if (data) {
       this.state = {
         familyIs: data.familyIs,
-        selectedFor: ["Ration"],
+        selectedFor: [],
         typeErr: "",
         disease: data.disease,
         diseaseErr: "",
@@ -42,6 +44,9 @@ export default class Tab3 extends Component {
         RemarksErr: "",
         imagesUri: data.imagesUri,
         imageErr: "",
+        userID: "",
+        dependentInfo: {},
+        profileInfo: {},
       };
     } else {
       this.state = {
@@ -54,6 +59,9 @@ export default class Tab3 extends Component {
         RemarksErr: "",
         imagesUri: [],
         imageErr: "",
+        userId: "",
+        dependentInfo: {},
+        personalInfo: {},
       };
     }
   }
@@ -61,7 +69,17 @@ export default class Tab3 extends Component {
     // selectedFruits is array of { label, value }
     this.setState({ selectedFor: value });
   };
-  async componentDidMount() {
+  componentDidMount() {
+    if (this.props.personalInfo) {
+      this.setState({ personalInfo: this.props.personalInfo });
+    }
+    if (this.props.dependentInfo) {
+      this.setState({ dependentInfo: this.props.dependentInfo });
+    }
+    if (this.props.userID) {
+      this.setState({ userID: this.props.userID });
+    }
+
     /* try {
       const retrievedItem = await AsyncStorage.getItem("DependentInfo");
       const item = JSON.parse(retrievedItem);
@@ -181,20 +199,32 @@ export default class Tab3 extends Component {
     }
   };
   onSubmit() {
-    console.log(this.state);
+    // console.log(this.state);
     // e.preventDefault(e);
     var isValid = this.validate();
-    console.log(isValid);
-    console.log(isValid.length);
+    // console.log(isValid);
     if (isValid.length === 0) {
-      const remarks = {
+      var remarks = {
         familyIs: this.state.familyIs,
         selectedFor: this.state.selectedFor,
         disease: this.state.disease,
         Remarks: this.state.Remarks,
         imagesUri: this.state.imagesUri,
       };
-      this.props.Remarks(remarks);
+
+      this.props.insertUser(
+        this.state.personalInfo,
+        this.state.dependentInfo,
+        this.state.userID,
+        remarks
+      );
+      this.props.insertDependents(
+        this.state.dependentInfo.dependents,
+        this.state.userID
+      );
+      // this.props.insertDependents(dependents);
+
+      // this.props.Remarks(remarks);
     }
   }
 
