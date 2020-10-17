@@ -9,6 +9,7 @@ import {
   ScrollView,
   Button,
   Image,
+  Switch,
 } from "react-native";
 import { openDatabase } from "react-native-sqlite-storage";
 import Style from "../styles";
@@ -48,6 +49,9 @@ export default class Tab1 extends Component {
         cellErr: "",
         Address: data.Address,
         AddressErr: "",
+        houseOwn: false,
+        monthlyRent: "",
+        monthlyRentErr: "",
         Town: data.Town,
         TownErr: "",
         Area: data.Area,
@@ -61,16 +65,16 @@ export default class Tab1 extends Component {
         skills: data.skills,
         zakat: data.zakat,
         gender: data.gender,
-        HbState: "",
+        HbState: data.HbState,
         HbStateErr: "",
-        Hbprofession: "",
+        Hbprofession: data.Hbprofession,
         HbprofessionErr: "",
-        Hbincome: "",
+        Hbincome: data.Hbincome,
         HbincomeErr: "",
-        HbUnemp: "",
+        HbUnemp: data.HbUnemp,
         HbUnempErr: "",
-        Hbcompany: "",
-        HbReason: "",
+        Hbcompany: data.Hbcompany,
+        HbReason: data.HbReason,
         HbReasonErr: "",
         genderErr: "",
         guardian: data.guardian,
@@ -99,6 +103,9 @@ export default class Tab1 extends Component {
         cellErr: "",
         Address: "",
         AddressErr: "",
+        houseOwn: false,
+        monthlyRent: "",
+        monthlyRentErr: "",
         Town: "",
         TownErr: "",
         Area: "",
@@ -162,6 +169,8 @@ export default class Tab1 extends Component {
       Hbincome,
       HbUnemp,
       HbReason,
+      monthlyRent,
+      houseOwn,
     } = this.state;
     if (first_name !== "") {
       if (first_name.length < 3) {
@@ -311,6 +320,12 @@ export default class Tab1 extends Component {
     } else {
       this.setState({ HbReasonErr: "" });
     }
+    if (!houseOwn && monthlyRent === "") {
+      this.setState({ monthlyRentErr: "monthly rent is missing" });
+      errors.push("rent err");
+    } else {
+      this.setState({ monthlyRentErr: "" });
+    }
 
     return errors;
   };
@@ -327,6 +342,7 @@ export default class Tab1 extends Component {
   async onSubmit() {
     // e.preventDefault();
     var state = this.state;
+    console.log(this.state.houseOwn);
     // console.log(state.fileUri);
     var isValid = await this.validate();
     /*   console.log(isValid.length);
@@ -355,8 +371,8 @@ export default class Tab1 extends Component {
         HbReason: state.HbReason,
         cell: state.cell,
         Address: state.Address,
-        houseOwner: "rent",
-        monthlyRent: parseInt("20000"),
+        houseOwner: JSON.stringify(state.houseOwn),
+        monthlyRent: parseInt(state.monthlyRent),
         Town: state.Town,
         Area: state.Area,
         profession: state.profession,
@@ -452,6 +468,14 @@ export default class Tab1 extends Component {
         /> */
     }
   }
+  onToggle = (value) => {
+    if (value === true) {
+      this.setState({ houseOwn: "own" });
+    }
+    if (value === false) {
+      this.setState({ houseOwn: "rent" });
+    }
+  };
   onStatusChange = (value) => {
     if (value === "-1") {
       this.setState({ HbState: "" });
@@ -479,7 +503,6 @@ export default class Tab1 extends Component {
     /* if (this.props.info) {
       console.log("data", this.props.info);
     } */
-    console.log(this.state);
     var {
       fnameErr,
       lnameErr,
@@ -496,6 +519,7 @@ export default class Tab1 extends Component {
       incomeErr,
       professionErr,
       cnicErr,
+      monthlyRentErr,
     } = this.state;
 
     var { gender, RelStatus } = this.state;
@@ -757,6 +781,26 @@ export default class Tab1 extends Component {
             placeholder={"Address"}
             style={Style.input}
           ></TextInput>
+          <View style={{ alignItems: "flex-start" }}>
+            <Text>House own?</Text>
+            <Switch
+              value={this.state.houseOwn}
+              onValueChange={(value) => this.setState({ houseOwn: value })}
+            />
+          </View>
+          {!this.state.houseOwn ? (
+            <>
+              <TextInput
+                value={this.state.monthlyRent}
+                onChangeText={(monthlyRent) => this.setState({ monthlyRent })}
+                placeholder={"Monthly rent in PKR"}
+                style={Style.input}
+              ></TextInput>
+              {monthlyRentErr ? (
+                <Text style={Style.error}>{monthlyRentErr}</Text>
+              ) : null}
+            </>
+          ) : null}
           {AddressErr ? <Text style={Style.error}>{AddressErr}</Text> : null}
           <View style={Style.picker}>
             <Picker

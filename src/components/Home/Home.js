@@ -45,9 +45,21 @@ class Home extends Component {
     });
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    if (this.props.user.id) {
+      console.log(this.props.user.id);
+    }
+    this.focusListener = this.props.navigation.addListener("focus", () => {
+      // Call ur function here.. or add logic.
+      if (this.props.user.id) {
+        console.log("focused", this.props.user.id);
+      }
+    });
+  }
 
   render() {
+    console.log("on id page");
+    console.log(this.props.navigation.isFocused());
     return (
       <>
         <Form
