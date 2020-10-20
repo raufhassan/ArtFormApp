@@ -10,24 +10,31 @@ export default class Form extends Component {
 
     this.state = {
       id: "",
+      idErr: "",
     };
 
     // this.handleEvent = this.handleEvent.bind(this);
   }
+  validate = () => {
+    if (this.state.id === "") {
+      this.setState({ idErr: "please enter id" });
+      return false;
+    } else {
+      this.setState({ idErr: "" });
+      return true;
+    }
+  };
   componentDidMount() {}
   onSubmit() {
     // var data;
     var userId = this.state.id;
-    // this.props.saveID(userId);
-    /* data = {
-      id: this.setState.id,
-      name: "hassan",
-      contact: parseInt("37647324"),
-      email: "raufhassan41@gmail.com",
-    }; */
-    // this.props.insertUser(data);
-    this.props.saveID(parseInt(userId));
-    this.props.navigation.navigate("Tab1");
+    if (this.validate()) {
+      this.props.saveID(parseInt(userId));
+      this.props.navigation.navigate("Tab1");
+    } else {
+      console.log("error");
+    }
+
     // console.log(userId);
     // this.props.insertUser(data);
     // this.props.saveID(userId);
@@ -56,22 +63,6 @@ export default class Form extends Component {
     } */
   }
 
-  // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   if (prevState.name !== this.state.name) {
-  //     this.handler();
-  //   }
-  // }
-
-  componentWillUnmount() {}
-
-  // Prototype methods, Bind in Constructor (ES2015)
-  // handleEvent() {}
-
-  // Class Properties (Stage 3 Proposal)
-  // handler = () => {
-  //   this.setState();
-  // };
-
   render() {
     // console.log(this.props.navigation.state);
     // let isFocused = this.props.navigation.isFocused();
@@ -85,13 +76,16 @@ export default class Form extends Component {
           placeholder={"User Id"}
           style={Style.input}
         ></TextInput>
+        {this.state.idErr ? (
+          <Text style={Style.error}>{this.state.idErr}</Text>
+        ) : null}
         <Button
           title={"Submit"}
           style={Style.submit}
           onPress={this.onSubmit.bind(this)}
         />
 
-        <TouchableOpacity
+        {/*  <TouchableOpacity
           onPress={() => this.props.navigation.navigate("Tab1")}
         >
           <Text> Go to Form </Text>
@@ -105,7 +99,7 @@ export default class Form extends Component {
           onPress={() => this.props.navigation.navigate("Tab3")}
         >
           <Text> Go to tab3 </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   }

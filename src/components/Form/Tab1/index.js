@@ -10,19 +10,18 @@ import {
   Button,
   Image,
   Switch,
+  BackHandler,
 } from "react-native";
-import { openDatabase } from "react-native-sqlite-storage";
 import Style from "../styles";
 // import DatePicker from "@react-native-community/datetimepicker";
 import DatePicker from "react-native-datepicker";
 import RadioForm from "react-native-simple-radio-button";
-import AsyncStorage from "@react-native-community/async-storage";
 import ImagePicker from "react-native-image-picker";
 import DropDownPicker from "react-native-dropdown-picker";
-import { useIsFocused } from "@react-navigation/native";
 import { Husband } from "./husband";
 // import MainFirst from "./Main";
 // import ValidationComponent from "react-native-form-validator";
+let RNFS = require("react-native-fs");
 
 var radio_props = [
   { label: "no  ", value: 0 },
@@ -33,7 +32,8 @@ export default class Tab1 extends Component {
   constructor(props) {
     super(props);
     const data = this.props.info;
-    if (data) {
+    console.log(data);
+    if (data != null) {
       this.state = {
         first_name: data.first_name,
         fnameErr: "",
@@ -49,8 +49,8 @@ export default class Tab1 extends Component {
         cellErr: "",
         Address: data.Address,
         AddressErr: "",
-        houseOwn: false,
-        monthlyRent: "",
+        houseOwn: data.houseOwn,
+        monthlyRent: data.monthlyRent,
         monthlyRentErr: "",
         Town: data.Town,
         TownErr: "",
@@ -79,13 +79,11 @@ export default class Tab1 extends Component {
         genderErr: "",
         guardian: data.guardian,
         guardianErr: "",
-        filepath: {
-          data: "",
-          uri: "",
-        },
+        filepath: data.cnic,
         fileData: "",
         fileUri: data.cnic,
         cnicErr: "",
+        userID: "",
       };
     } else {
       this.state = {
@@ -134,15 +132,14 @@ export default class Tab1 extends Component {
         husbandState: "",
         guardian: "",
         guardianErr: "",
-        filepath: {
-          data: "",
-          uri: "",
-        },
+        filepath: "",
         fileData: "",
         fileUri: "",
         cnicErr: "",
+        userID: "",
       };
     }
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
   validate = () => {
@@ -240,7 +237,7 @@ export default class Tab1 extends Component {
         this.setState({ AddressErr: "" });
       }
     } else {
-      this.setState({ AddressErr: "Addrees is empty" });
+      this.setState({ AddressErr: "Address is empty" });
       errors.push("addres error");
     }
     if (Town === "") {
@@ -331,14 +328,32 @@ export default class Tab1 extends Component {
   };
 
   async componentDidMount() {
-    /*  try {
-      const retrievedItem = await AsyncStorage.getItem("id");
-      const item = JSON.parse(retrievedItem);
-      console.log("data of async", item);
-    } catch (error) {
-      console.log(error.message);
-    } */
+    if (this.props.userID) {
+      await this.setState({ userID: this.props.userID });
+    }
   }
+  componentWillMount() {
+    BackHandler.addEventListener(
+      "hardwareBackPress",
+      this.handleBackButtonClick
+    );
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      "hardwareBackPress",
+      this.handleBackButtonClick
+    );
+  }
+  handleBackButtonClick() {
+    if (this.state.userID !== "") {
+      BackHandler.exitApp();
+    } else {
+      this.props.navigation.goBack(null);
+    }
+    return true;
+  }
+
   async onSubmit() {
     // e.preventDefault();
     var state = this.state;
@@ -371,19 +386,19 @@ export default class Tab1 extends Component {
         HbReason: state.HbReason,
         cell: state.cell,
         Address: state.Address,
-        houseOwner: JSON.stringify(state.houseOwn),
-        monthlyRent: parseInt(state.monthlyRent),
+        houseOwn: state.houseOwn,
+        monthlyRent: state.monthlyRent,
         Town: state.Town,
         Area: state.Area,
         profession: state.profession,
         empStatus: state.empStatus,
         MonthlyIncome: state.MonthlyIncome,
         skills: state.skills,
-        cnic: state.fileUri,
+        cnic: `file://${state.fileUri}`,
       };
       console.log(personalInfo);
       // await AsyncStorage.setItem("Personal", JSON.stringify(personalInfo));
-      // this.props.navigation.navigate("Tab2");
+      this.props.navigation.navigate("Tab2");
       this.props.personalInfo(personalInfo);
     } else {
       console.log(isValid);
@@ -412,16 +427,28 @@ export default class Tab1 extends Component {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
+        const imagePath = `${
+          RNFS.DocumentDirectoryPath
+        }/${new Date().toISOString()}.jpg`.replace(/:/g, "-");
+        console.log(imagePath);
+        RNFS.copyFile(response.uri, imagePath)
+          .then((res) => {
+            console.log("file written");
+          })
+          .catch((err) => {
+            console.log("ERROR: image file write failed!!!");
+            console.log(err.message, err.code);
+          });
 
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         // alert(JSON.stringify(response));s
         // console.log("response", JSON.stringify(response));
-        console.log(source);
+        // console.log(source);
         this.setState({
-          filePath: response,
+          filepath: response.path,
           fileData: response.data,
-          fileUri: response.uri,
+          fileUri: imagePath,
         });
       }
     });
@@ -445,11 +472,24 @@ export default class Tab1 extends Component {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
+        const imagePath = `${
+          RNFS.DocumentDirectoryPath
+        }/${new Date().toISOString()}.jpg`.replace(/:/g, "-");
+        console.log(imagePath);
+        RNFS.copyFile(response.uri, imagePath)
+          .then((res) => {
+            console.log("file written");
+          })
+          .catch((err) => {
+            console.log("ERROR: image file write failed!!!");
+            console.log(err.message, err.code);
+          });
+
         // console.log("response", JSON.stringify(response));
         this.setState({
           filePath: response,
           fileData: response.data,
-          fileUri: response.uri,
+          fileUri: imagePath,
         });
       }
     });
@@ -458,14 +498,21 @@ export default class Tab1 extends Component {
   renderFileUri() {
     if (this.state.fileUri) {
       return (
-        <Image source={{ uri: this.state.fileUri }} style={Style.images} />
+        <Image
+          source={{ uri: `file://${this.state.fileUri}` }}
+          style={Style.images}
+        />
       );
     } else {
       return null;
-      /*  <Image
-          source={require("../../../../assets/images/image1.jpg")}
+      /*  return (
+        <Image
+          source={{
+            uri: `file:///data/user/0/com.formapp/files/2020-10-20T10-14-08.955Z.jpg`,
+          }}
           style={Style.images}
-        /> */
+        />
+      ); */
     }
   }
   onToggle = (value) => {
@@ -503,6 +550,7 @@ export default class Tab1 extends Component {
     /* if (this.props.info) {
       console.log("data", this.props.info);
     } */
+    console.log(this.state.userID);
     var {
       fnameErr,
       lnameErr,
@@ -578,7 +626,9 @@ export default class Tab1 extends Component {
       // <MainFirst>
       <ScrollView style={Style.scrollContainer}>
         <View style={Style.container}>
-          <Text style={Style.myText}> Personal Info</Text>
+          <View style={{ alignItems: "center" }}>
+            <Text style={Style.myText}> Personal Info</Text>
+          </View>
           <TextInput
             value={this.state.first_name}
             onChangeText={(first_name) => this.setState({ first_name })}
@@ -630,8 +680,9 @@ export default class Tab1 extends Component {
                 })
               }
             /> */}
-            {genderErr ? <Text style={Style.error}>{genderErr}</Text> : null}
           </View>
+          {genderErr ? <Text style={Style.error}>{genderErr}</Text> : null}
+
           {/* {this.state.gender === "male" ? father : husband} */}
           {input}
 
@@ -679,11 +730,11 @@ export default class Tab1 extends Component {
           /> */}
           {ReligionErr ? <Text style={Style.error}>{ReligionErr}</Text> : null}
           {this.state.Religion === "Islam" ? (
-            <View>
+            <View style={Style.center}>
               <Text>Eligible for zakat?</Text>
               <RadioForm
                 radio_props={radio_props}
-                initial={0}
+                initial={this.state.zakat}
                 formHorizontal={true}
                 onPress={(event) => this.setState({ zakat: event })}
               />
@@ -781,7 +832,8 @@ export default class Tab1 extends Component {
             placeholder={"Address"}
             style={Style.input}
           ></TextInput>
-          <View style={{ alignItems: "flex-start" }}>
+          {AddressErr ? <Text style={Style.error}>{AddressErr}</Text> : null}
+          <View style={{ width: "80%", alignItems: "flex-start" }}>
             <Text>House own?</Text>
             <Switch
               value={this.state.houseOwn}
@@ -794,6 +846,7 @@ export default class Tab1 extends Component {
                 value={this.state.monthlyRent}
                 onChangeText={(monthlyRent) => this.setState({ monthlyRent })}
                 placeholder={"Monthly rent in PKR"}
+                keyboardType={"numeric"}
                 style={Style.input}
               ></TextInput>
               {monthlyRentErr ? (
@@ -801,7 +854,6 @@ export default class Tab1 extends Component {
               ) : null}
             </>
           ) : null}
-          {AddressErr ? <Text style={Style.error}>{AddressErr}</Text> : null}
           <View style={Style.picker}>
             <Picker
               selectedValue={this.state.Town}
@@ -958,21 +1010,17 @@ export default class Tab1 extends Component {
             style={Style.input}
           ></TextInput>
 
-          <TouchableOpacity onPress={this.chooseImage} style={Style.imagebtn}>
-            <Text style={{ color: "white" }}>Cnic Image</Text>
+          <TouchableOpacity onPress={this.chooseImage} style={Style.upload}>
+            <Text style={{ color: "#428bca", fontWeight: "bold" }}>
+              upload cnic Image
+            </Text>
           </TouchableOpacity>
           {cnicErr ? <Text style={Style.error}>{cnicErr}</Text> : null}
           <View style={Style.ImageSections}>
-            <View>
-              {this.renderFileUri()}
-              <Text style={{ textAlign: "center" }}>File Uri</Text>
-            </View>
+            <View>{this.renderFileUri()}</View>
           </View>
-          <Button
-            title={"submit"}
-            style={Style.submit}
-            onPress={this.onSubmit.bind(this)}
-          />
+
+          <Button title={"submit"} onPress={this.onSubmit.bind(this)} />
           <Text></Text>
         </View>
       </ScrollView>

@@ -12,6 +12,7 @@ import { createStore, applyMiddleware } from "redux";
 import AsyncStorage from "@react-native-community/async-storage";
 import rootReducer from "./redux/reducers";
 import { persistStore, persistReducer } from "redux-persist";
+import thunk from "redux-thunk";
 import logger from "redux-logger";
 import Routes from "./src/routes/index";
 import Main from "./src/components/Main";
@@ -22,9 +23,9 @@ const persistConfig = {
   storage: AsyncStorage,
   // Whitelist:['user']
 };
-
+const middleware = [thunk, logger];
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-const store = createStore(persistedReducer, applyMiddleware(logger));
+const store = createStore(persistedReducer, applyMiddleware(...middleware));
 const persistedStore = persistStore(store);
 const App = () => {
   return (

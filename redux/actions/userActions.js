@@ -39,27 +39,27 @@ export const Remarks = (data) => {
 };
 
 export const saveID = (id) => {
-  /*  if (userData) {
-    dispatch({
-      type: GET_ID,
-      payload: id,
-    });
-  } */
+  /*  return {
+    type: REMOVE_DATA,
+    payload: null,
+  }; */
   return {
     type: GET_ID,
     payload: id,
   };
 };
 
-export const insertUser = (user, dependent, userID, remarks) => {
+export const insertUser = (user, dependent, userID, remarks) => (dispatch) => {
   console.log("called");
   var selectedFor = JSON.stringify(remarks.selectedFor);
   var images = JSON.stringify(remarks.imagesUri);
+  var houseOwn = JSON.stringify(user.houseOwn);
+  var monthlyRent = parseInt(user.monthlyRent);
 
   db.transaction((tx) => {
     // Loop would be here in case of many values
     tx.executeSql(
-      "INSERT INTO user (user_id,cnic_image, first_name, last_name, gender, guardian, religion, zakat, DOB, marital_status, husband_status, husband_profession, husband_income, husband_company, husband_unemp_type, husband_unemp_reason, address, house_ownership, monthly_rent, town, area, profession, emp_status, monthly_income, skills, rent_exp, education_exp, utility_exp, overall_income, family_is, family_registered, remarks, images) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO user (user_id,cnic_image, first_name, last_name, gender, guardian, religion, zakat, DOB, marital_status, husband_status, husband_profession, husband_income, husband_company, husband_unemp_type, husband_unemp_reason, address, house_ownership, monthly_rent, town, area, profession, emp_status, monthly_income, skills, rent_exp, education_exp, utility_exp, overall_income, family_is, family_registered,disease, remarks, images) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
       [
         userID,
         user.cnic,
@@ -74,12 +74,12 @@ export const insertUser = (user, dependent, userID, remarks) => {
         user.HbState,
         user.Hbprofession,
         user.Hbincome,
-        "nothing",
+        user.Hbcompany,
         user.HbUnemp,
         user.HbReason,
         user.Address,
-        user.houseOwner,
-        user.monthlyRent,
+        houseOwn,
+        monthlyRent,
         user.Town,
         user.Area,
         user.profession,
@@ -92,14 +92,18 @@ export const insertUser = (user, dependent, userID, remarks) => {
         dependent.OverallIncome,
         remarks.familyIs,
         selectedFor,
+        remarks.disease,
         remarks.Remarks,
         images,
       ],
       (tx, results) => {
         console.log("Insert Results", results.rowsAffected);
         if (results.rowsAffected > 0) {
+          dispatch({
+            type: REMOVE_DATA,
+            payload: null,
+          });
           console.log("insertion successfull");
-          // insert = true;
         } else {
           console.log(" Failed");
         }
@@ -109,10 +113,10 @@ export const insertUser = (user, dependent, userID, remarks) => {
       }
     );
   });
-  return {
+  /*   return {
     type: GET_ID,
     payload: null,
-  };
+  }; */
 };
 export const insertDependents = (dependents, userID) => {
   db.transaction((tx) => {

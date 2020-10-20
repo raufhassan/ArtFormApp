@@ -24,4 +24,8 @@ export default Style = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 4,
   },
+  error: {
+    color: "red",
+    marginBottom: 10,
+  },
 });

@@ -10,14 +10,15 @@ export default Style = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // justifyContent: "center",
-    // alignItems: "center",
-    padding: hp(7),
+    justifyContent: "center",
+    alignItems: "center",
+    // padding: hp(7),
+    paddingVertical: 30,
   },
   scrollContainer: {
     // backgroundColor: "#53206a",
     // justifyContent: "center",
-    flexGrow: 1,
+    flex: 1,
   },
   input: {
     width: wp("80%"),
@@ -29,6 +30,11 @@ export default Style = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 4,
   },
+  center: {
+    width: wp("80%"),
+    alignItems: "flex-start",
+  },
+
   linkstyle: {
     marginTop: 10,
     color: "#fff",
@@ -63,8 +69,10 @@ export default Style = StyleSheet.create({
   submit: {
     color: "#fff",
     marginBottom: 10,
-    backgroundColor: "#000",
+    backgroundColor: "#428bca",
     paddingBottom: 20,
+    marginTop: 40,
+    width: wp("80%"),
   },
   images: {
     width: 150,
@@ -90,9 +98,9 @@ export default Style = StyleSheet.create({
     fontSize: hp("3%"),
   },
   upload: {
-    backgroundColor: "grey",
     padding: 10,
-    marginBottom: 10,
+    marginVertical: 10,
+    alignItems: "center",
   },
   Dropdown: {
     width: wp("80%"),

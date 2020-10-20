@@ -18,6 +18,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 import ImagePicker from "react-native-image-crop-picker";
 import { openDatabase } from "react-native-sqlite-storage";
+let RNFS = require("react-native-fs");
 var db = openDatabase({ name: "UserDatabase.db" });
 
 const options = ["Ration", "Education ", "Small Business Support", "Health"];
@@ -33,10 +34,10 @@ export default class Tab3 extends Component {
   constructor(props) {
     super(props);
     const data = this.props.info;
-    if (data) {
+    if (data !== null) {
       this.state = {
         familyIs: data.familyIs,
-        selectedFor: [],
+        selectedFor: data.selectedFor,
         typeErr: "",
         disease: data.disease,
         diseaseErr: "",
@@ -133,14 +134,25 @@ export default class Tab3 extends Component {
       compressImageQuality: 0.8,
       mediaType: "photo",
     }).then((images) => {
-      console.log(images);
+      // console.log(images);
 
       const uri = images.map((el, index) => {
         // console.log("recieved image", el);
         //  uri[index] = el.path;
-        return el.path;
+        var path = `${
+          RNFS.DocumentDirectoryPath
+        }/${new Date().toISOString()}${index}.jpg`.replace(/:/g, "-");
+        RNFS.copyFile(el.path, path)
+          .then((res) => {
+            console.log("file written");
+          })
+          .catch((err) => {
+            console.log("ERROR: image file write failed!!!");
+            console.log(err.message, err.code);
+          });
+        return `file://${path}`;
       });
-      console.log(uri);
+      // console.log(uri);
       this.setState({ imagesUri: uri });
     });
   };
@@ -165,11 +177,10 @@ export default class Tab3 extends Component {
         count = count + 1;
       }
     });
-    console.log(count);
     if (count == 1) {
       return (
         <>
-          <View style={{ marginVertical: 10 }}>
+          <View style={{ marginBottom: 10 }}>
             <DropDownPicker
               items={[
                 { label: "hepatitas", value: "hepatitas" },
@@ -177,7 +188,7 @@ export default class Tab3 extends Component {
                 { label: "Covid 19", value: "Covid 19" },
               ]}
               defaultValue={this.state.disease}
-              containerStyle={{ height: 40 }}
+              containerStyle={{ height: 50, width: 330 }}
               style={{ backgroundColor: "#fafafa" }}
               placeholder={"select a disease"}
               itemStyle={{
@@ -235,9 +246,11 @@ export default class Tab3 extends Component {
     return (
       <ScrollView style={Style.scrollContainer}>
         <View style={Style.container}>
-          {/* <Text style={Style.myText}>INITIAL SCREENING</Text> */}
-          <View>
-            <Text>Is Family deserving? </Text>
+          <View style={{ alignItems: "center", marginTop: 50 }}>
+            <Text style={Style.myText}> Initial Screening</Text>
+          </View>
+          <View style={Style.center}>
+            <Text style={Style.label}>Is Family deserving? </Text>
             <RadioForm
               radio_props={radio_props}
               initial={0}
@@ -253,7 +266,7 @@ export default class Tab3 extends Component {
               selectedItems={this.state.selectedFor}
               onSelectionsChange={(value) => this.onSelectionsChange(value)}
             /> */}
-            <View style={{ marginVertical: 10 }}>
+            <View style={{ marginVertical: 10, alignItems: "flex-start" }}>
               <DropDownPicker
                 items={[
                   {
@@ -279,7 +292,9 @@ export default class Tab3 extends Component {
                 min={0}
                 max={10}
                 defaultValue={this.state.selectedFor}
-                containerStyle={{ height: 40 }}
+                containerStyle={{ height: 50, width: 330 }}
+                style={{ backgroundColor: "#fafafa" }}
+                dropDownStyle={{ height: 100 }}
                 itemStyle={{
                   justifyContent: "flex-start",
                 }}
@@ -292,7 +307,6 @@ export default class Tab3 extends Component {
             </View>
           </View>
           {typeErr ? <Text style={Style.error}>{typeErr}</Text> : null}
-
           {/*    {this.onHealth() ? (
           <View>
             <Text>disease</Text>
@@ -311,11 +325,13 @@ export default class Tab3 extends Component {
           ></TextInput>
           {RemarksErr ? <Text style={Style.error}>{RemarksErr}</Text> : null}
           <TouchableOpacity style={Style.upload} onPress={this.OpenLibrary}>
-            <Text style={{ color: "#fff" }}>upload images</Text>
+            <Text style={{ color: "#428bca", fontWeight: "bold" }}>
+              upload images
+            </Text>
           </TouchableOpacity>
           {imageErr ? <Text style={Style.error}>{imageErr}</Text> : null}
           <ScrollView horizontal>
-            <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={{ flex: 1, flexDirection: "row", marginVertical: 10 }}>
               {this.state.imagesUri
                 ? this.state.imagesUri.map((el, index) => {
                     console.log(el);
@@ -337,11 +353,13 @@ export default class Tab3 extends Component {
                 : null}
             </View>
           </ScrollView>
-          <Button
-            title={"submit"}
-            style={Style.submit}
-            onPress={this.onSubmit.bind(this)}
-          />
+          <View style={{ alignItems: "center", flex: 1, width: "100%" }}>
+            <Button
+              title={"submit"}
+              style={Style.submit}
+              onPress={this.onSubmit.bind(this)}
+            />
+          </View>
         </View>
       </ScrollView>
     );

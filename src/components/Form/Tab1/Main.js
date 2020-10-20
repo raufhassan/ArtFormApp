@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { Text } from "react-native";
+import { Text, BackHandler } from "react-native";
 import Tab1 from "./index";
 import { personalInfo } from "../../../../redux/actions/userActions";
 import { connect } from "react-redux";
+import isEmpty from "../../../validation/is-empty";
+import user from "../../../../redux/reducers/user";
 
 class MainFirst extends Component {
   constructor(props) {
@@ -13,11 +15,25 @@ class MainFirst extends Component {
   componentDidMount() {
     console.log(this.props.user.user);
   }
+  /*  componentWillReceiveProps(nextProps) {
+    if (nextProps.user.user !== this.props.user.user) {
+      this.props.navigation.navigate("Tab2");
+    }
+  } */
 
   render() {
-    var info;
-    if (this.props.user.user) {
+    var info, userID;
+    if (isEmpty(this.props.user.user)) {
+      info = null;
+      console.log("empty");
+    } else {
       info = this.props.user.user;
+      console.log("not empty");
+    }
+    if (this.props.user.id !== null) {
+      userID = this.props.user.id;
+    } else {
+      userID = null;
     }
     return (
       <>
@@ -27,6 +43,7 @@ class MainFirst extends Component {
           navigation={this.props.navigation}
           personalInfo={this.props.personalInfo}
           info={info}
+          userID={userID}
         />
       </>
     );

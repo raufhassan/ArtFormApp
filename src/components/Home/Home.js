@@ -18,7 +18,7 @@ class Home extends Component {
           if (res.rows.length == 0) {
             txn.executeSql("DROP TABLE IF EXISTS user", []);
             txn.executeSql(
-              "CREATE TABLE IF NOT EXISTS user(user_id INTEGER PRIMARY KEY AUTOINCREMENT,cnic_image VARCHAR(255), first_name VARCHAR(20), last_name VARCHAR(20), gender VARCHAR(10), guardian VARCHAR(10), religion VARCHAR(10), zakat INT(1), DOB VARCHAR(10), marital_status VARCHAR(10), husband_status VARCHAR(10) NULL, husband_profession VARCHAR(10) NULL, husband_income INT(10) NULL,husband_company VARCHAR(20) NULL, husband_unemp_type VARCHAR(20) NULL, husband_unemp_reason VARCHAR(40) NULL, address VARCHAR(40), house_ownership VARCHAR(10), monthly_rent INT(10) , town VARCHAR(10), area VARCHAR(20), profession VARCHAR(10), emp_status VARCHAR(10), monthly_income INT(10), skills VARCHAR(20), rent_exp INT(10), education_exp INT(10), utility_exp INT(10), overall_income INT(10), family_is VARCHAR(20), family_registered VARCHAR(20),remarks VARCHAR(50),images VARCHAR(255))",
+              "CREATE TABLE IF NOT EXISTS user(user_id INTEGER PRIMARY KEY AUTOINCREMENT,cnic_image VARCHAR(255), first_name VARCHAR(20), last_name VARCHAR(20), gender VARCHAR(10), guardian VARCHAR(10), religion VARCHAR(10), zakat INT(1), DOB VARCHAR(10), marital_status VARCHAR(10), husband_status VARCHAR(10) NULL, husband_profession VARCHAR(10) NULL, husband_income INT(10) NULL,husband_company VARCHAR(20) NULL, husband_unemp_type VARCHAR(20) NULL, husband_unemp_reason VARCHAR(40) NULL, address VARCHAR(40), house_ownership VARCHAR(10), monthly_rent INT(10) , town VARCHAR(10), area VARCHAR(20), profession VARCHAR(10), emp_status VARCHAR(10), monthly_income INT(10), skills VARCHAR(20), rent_exp INT(10), education_exp INT(10), utility_exp INT(10), overall_income INT(10), family_is VARCHAR(20), family_registered VARCHAR(20),disease VARCHAR(20),remarks VARCHAR(50),images VARCHAR(255))",
               []
             );
           }
@@ -47,19 +47,18 @@ class Home extends Component {
 
   componentDidMount() {
     if (this.props.user.id) {
-      console.log(this.props.user.id);
+      this.props.navigation.navigate("Tab1");
     }
     this.focusListener = this.props.navigation.addListener("focus", () => {
       // Call ur function here.. or add logic.
       if (this.props.user.id) {
-        console.log("focused", this.props.user.id);
+        // console.log("focused id", this.props.user.id);
+        // this.props.navigation.navigate("Tab1");
       }
     });
   }
 
   render() {
-    console.log("on id page");
-    console.log(this.props.navigation.isFocused());
     return (
       <>
         <Form

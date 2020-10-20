@@ -8,6 +8,7 @@ import {
   Picker,
   ScrollView,
   Button,
+  BackHandler,
 } from "react-native";
 // import { RadioButton } from "react-native-paper";
 import CustomDropDown from "react-native-customised-editable-picker";
@@ -26,7 +27,7 @@ class Tab2 extends Component {
   constructor(props) {
     super(props);
     const data = this.props.info;
-    if (data) {
+    if (data !== null) {
       this.state = {
         Dependents: data.dependents,
 
@@ -74,7 +75,6 @@ class Tab2 extends Component {
   }
 
   async componentDidMount() {
-    console.log(this.props.info.dependents);
     /* try {
       const retrievedItem = await AsyncStorage.getItem("Personal");
       const item = JSON.parse(retrievedItem);
@@ -83,6 +83,7 @@ class Tab2 extends Component {
       console.log(error.message);
     } */
   }
+
   valdateDependent = () => {
     // let isvalid;
     var error = [];
@@ -274,6 +275,7 @@ class Tab2 extends Component {
       };
       console.log(data);
       this.props.DependentInfo(data);
+      this.props.navigation.navigate("Tab3");
       /* await AsyncStorage.setItem("DependentInfo", JSON.stringify(data));
       this.props.navigation.navigate("Tab3"); */
     }
@@ -408,7 +410,7 @@ class Tab2 extends Component {
             <Text>Recommended for Counselling?</Text>
             <RadioForm
               radio_props={radio_props}
-              initial={0}
+              initial={item.councelling}
               formHorizontal={true}
               onPress={(event) => this.handleCouncel(event, index)}
             />
@@ -417,7 +419,7 @@ class Tab2 extends Component {
             <Text>Education Support Required?</Text>
             <RadioForm
               radio_props={radio_props}
-              initial={0}
+              initial={item.EducationSupport}
               formHorizontal={true}
               onPress={(event) => this.handleEdSupport(event, index)}
             />
@@ -435,7 +437,9 @@ class Tab2 extends Component {
     return (
       <ScrollView style={Style.scrollContainer}>
         <View style={Style.container}>
-          <Text style={Style.myText}> Dependent Info</Text>
+          <View style={{ alignItems: "center" }}>
+            <Text style={Style.myText}> Dependent Info</Text>
+          </View>
           {this.DependentForm()}
           {/* <CustomDropDown data={this.state.data} isEditable={true} /> */}
 

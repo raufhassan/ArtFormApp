@@ -40,6 +40,7 @@ export default function (state = initialState, action) {
     case REMOVE_DATA:
       return {
         ...state,
+        isAuthenticated: action.payload,
         id: null,
         user: {},
         dependent: {},
