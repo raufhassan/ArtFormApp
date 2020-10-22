@@ -21,11 +21,11 @@ import { openDatabase } from "react-native-sqlite-storage";
 let RNFS = require("react-native-fs");
 var db = openDatabase({ name: "UserDatabase.db" });
 
-const options = ["Ration", "Education ", "Small Business Support", "Health"];
+// const options = ["Ration", "Education ", "Small Business Support", "Health"];
 
 var radio_props = [
   { label: "Most deserving", value: "Most deserving" },
-  { label: "deserving ", value: "deserving" },
+  { label: "Deserving ", value: "Deserving" },
   { label: "Not deserving ", value: "Not deserving" },
   { label: "Temporarily relief ", value: "Temporarily relief" },
 ];
@@ -37,6 +37,7 @@ export default class Tab3 extends Component {
     if (data !== null) {
       this.state = {
         familyIs: data.familyIs,
+        familyErr: "",
         selectedFor: data.selectedFor,
         typeErr: "",
         disease: data.disease,
@@ -46,12 +47,14 @@ export default class Tab3 extends Component {
         imagesUri: data.imagesUri,
         imageErr: "",
         userID: "",
+        personID: "",
         dependentInfo: {},
         profileInfo: {},
       };
     } else {
       this.state = {
         familyIs: "",
+        familyErr: "",
         selectedFor: [],
         typeErr: "",
         disease: "",
@@ -60,17 +63,32 @@ export default class Tab3 extends Component {
         RemarksErr: "",
         imagesUri: [],
         imageErr: "",
-        userId: "",
+        userID: "",
+        personID: "",
         dependentInfo: {},
         personalInfo: {},
       };
     }
+    db.transaction((txn) => {
+      txn.executeSql(
+        // "SELECT * FROM sqlite_master WHERE type='table' AND name='dependents'",
+        "select * FROM 'user'",
+        [],
+        (tx, res) => {
+          var id = res.rows.length + 1;
+          // this.setState({userID: id})
+          // console.log("item:", id);
+          this.setState({ personID: id });
+        }
+      );
+    });
   }
   onSelectionsChange = (value) => {
     // selectedFruits is array of { label, value }
     this.setState({ selectedFor: value });
   };
-  componentDidMount() {
+  async componentDidMount() {
+    var person = await this.props.personID;
     if (this.props.personalInfo) {
       this.setState({ personalInfo: this.props.personalInfo });
     }
@@ -80,6 +98,9 @@ export default class Tab3 extends Component {
     if (this.props.userID) {
       this.setState({ userID: this.props.userID });
     }
+    /*  if (person) {
+      this.setState({ personID: person });
+    } */
 
     /* try {
       const retrievedItem = await AsyncStorage.getItem("DependentInfo");
@@ -91,7 +112,7 @@ export default class Tab3 extends Component {
   }
   validate = () => {
     var errors = [];
-    const { selectedFor, disease, Remarks, imagesUri } = this.state;
+    const { selectedFor, disease, Remarks, imagesUri, familyIs } = this.state;
     var count = 0;
     this.state.selectedFor.map((item) => {
       if (item === "Health") {
@@ -121,6 +142,12 @@ export default class Tab3 extends Component {
       errors.push("images error");
     } else {
       this.setState({ imageErr: "" });
+    }
+    if (familyIs === "") {
+      this.setState({ familyErr: "please select review" });
+      errors.push("images error");
+    } else {
+      this.setState({ familyErr: "" });
     }
     return errors;
   };
@@ -183,7 +210,7 @@ export default class Tab3 extends Component {
           <View style={{ marginBottom: 10 }}>
             <DropDownPicker
               items={[
-                { label: "hepatitas", value: "hepatitas" },
+                { label: "Hepatitas", value: "hepatitas" },
                 { label: "Cancer", value: "Cancer" },
                 { label: "Covid 19", value: "Covid 19" },
               ]}
@@ -209,9 +236,10 @@ export default class Tab3 extends Component {
       );
     }
   };
-  onSubmit() {
+  async onSubmit() {
     // console.log(this.state);
     // e.preventDefault(e);
+    console.log(this.state);
     var isValid = this.validate();
     // console.log(isValid);
     if (isValid.length === 0) {
@@ -222,34 +250,64 @@ export default class Tab3 extends Component {
         Remarks: this.state.Remarks,
         imagesUri: this.state.imagesUri,
       };
-
       this.props.insertUser(
         this.state.personalInfo,
         this.state.dependentInfo,
         this.state.userID,
         remarks
       );
+      // console.log("user", this.state.userID);
+      // console.log("person", this.state.personID);
       this.props.insertDependents(
         this.state.dependentInfo.dependents,
-        this.state.userID
+        this.state.personID
       );
       // this.props.insertDependents(dependents);
 
-      // this.props.Remarks(remarks);
+      this.props.Remarks(remarks);
     }
   }
 
   render() {
+    // console.log("personId", this.state.personID);
     /*   console.log("state variable", this.state.selectedFor);
     console.log(this.state.imagesUri); */
-    const { RemarksErr, typeErr, imageErr } = this.state;
+    const { RemarksErr, typeErr, imageErr, familyErr } = this.state;
     return (
-      <ScrollView style={Style.scrollContainer}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={Style.container}>
           <View style={{ alignItems: "center", marginTop: 50 }}>
             <Text style={Style.myText}> Initial Screening</Text>
           </View>
+          <View style={{ marginTop: 20 }}></View>
           <View style={Style.center}>
+            <Text style={Style.label}>Is Family deserving? </Text>
+          </View>
+          <View style={{ marginTop: 10 }}></View>
+          <View style={Style.picker}>
+            <Picker
+              selectedValue={this.state.familyIs}
+              style={Style.picker}
+              onValueChange={(value) => {
+                if (value === "-1") {
+                  this.setState({ familyIs: "" });
+                } else {
+                  this.setState({ familyIs: value });
+                }
+              }}
+            >
+              <Picker.Item label="Select review" value="-1" />
+              <Picker.Item label="Most deserving" value="Most deserving" />
+              <Picker.Item label="Deserving" value="Deserving" />
+              <Picker.Item label="Not deserving" value="Not deserving" />
+              <Picker.Item
+                label="Temporarily relief"
+                value="Temporarily relief"
+              />
+            </Picker>
+          </View>
+          {familyErr ? <Text style={Style.error}>{familyErr}</Text> : null}
+          {/*  <View style={Style.center}>
             <Text style={Style.label}>Is Family deserving? </Text>
             <RadioForm
               radio_props={radio_props}
@@ -257,7 +315,7 @@ export default class Tab3 extends Component {
               //   formHorizontal={true}
               onPress={(value) => this.setState({ familyIs: value })}
             />
-          </View>
+          </View> */}
           <View>
             <Text style={Style.label}>Family registered for</Text>
 
@@ -279,7 +337,7 @@ export default class Tab3 extends Component {
                   },
                   {
                     label: "Small Business support",
-                    value: "business",
+                    value: "Business",
                   },
                   {
                     label: "Health",
@@ -288,7 +346,7 @@ export default class Tab3 extends Component {
                 ]}
                 multiple={true}
                 multipleText="%d items have been selected."
-                placeholder={"select registration type"}
+                placeholder={"Select registration type"}
                 min={0}
                 max={10}
                 defaultValue={this.state.selectedFor}

@@ -28,7 +28,7 @@ class MainFirst extends Component {
       console.log("empty");
     } else {
       info = this.props.user.user;
-      console.log("not empty");
+      console.log("not fu empty");
     }
     if (this.props.user.id !== null) {
       userID = this.props.user.id;

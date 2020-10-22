@@ -8,21 +8,27 @@ import {
 import { connect } from "react-redux";
 import isEmpty from "../../../validation/is-empty";
 import { BackHandler } from "react-native";
-
+import { openDatabase } from "react-native-sqlite-storage";
+var db = openDatabase({ name: "UserDatabase.db" });
 class MainThird extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      personID: "",
+    };
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
-  componentWillReceiveProps(nextProps) {
+
+  /*   componentWillReceiveProps(nextProps) {
     if (nextProps.user.id !== this.props.user.id) {
       this.props.navigation.navigate("Home");
     }
-  }
+  } */
 
-  componentDidMount() {}
+  /* async componentDidMount() {
+    await this.personID();
+  } */
   componentWillMount() {
     BackHandler.addEventListener(
       "hardwareBackPress",
@@ -56,6 +62,7 @@ class MainThird extends Component {
     if (this.props.user.id) {
       userID = this.props.user.id;
     }
+
     return (
       <>
         <Tab3

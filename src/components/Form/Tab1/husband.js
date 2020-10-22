@@ -23,7 +23,7 @@ export function Husband(props) {
         <TextInput
           value={data.Hbprofession}
           onChangeText={(value) => props.onProfessionChange(value)}
-          placeholder={"profession"}
+          placeholder={"Profession"}
           style={Style.input}
         />
         {data.HbprofessionErr ? (
@@ -53,19 +53,19 @@ export function Husband(props) {
         <TextInput
           value={data.Hbprofession}
           onChangeText={(value) => props.onProfessionChange(value)}
-          placeholder={"profession"}
+          placeholder={"Profession"}
           style={Style.input}
         />
         <TextInput
           value={data.Hbincome}
           onChangeText={(value) => props.onIncomeChange(value)}
-          placeholder={"income"}
+          placeholder={"Income"}
           style={Style.input}
         />
         <TextInput
           value={data.Hbcompany}
           onChangeText={(value) => props.onCompanyChange(value)}
-          placeholder={"company"}
+          placeholder={"Company"}
           style={Style.input}
         />
       </>

@@ -5,6 +5,7 @@ import {
   GET_DEPENDENTS,
   GET_REMARKS,
   REMOVE_DATA,
+  LOGOUT_USER,
 } from "../actions/types";
 
 const initialState = {
@@ -45,6 +46,11 @@ export default function (state = initialState, action) {
         user: {},
         dependent: {},
         remarks: {},
+      };
+    case LOGOUT_USER:
+      return {
+        ...state,
+        id: null,
       };
     default:
       return state;

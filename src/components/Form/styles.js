@@ -57,7 +57,6 @@ export default Style = StyleSheet.create({
   Date: {
     width: wp("80%"),
     height: hp("7%"),
-    padding: 10,
     backgroundColor: "#fff",
     marginBottom: 10,
     justifyContent: "flex-start",
@@ -114,5 +113,25 @@ export default Style = StyleSheet.create({
   error: {
     color: "red",
     marginBottom: 10,
+  },
+  // add button style
+  buttonStyle: {
+    flexDirection: "row",
+    paddingVertical: 5,
+    backgroundColor: "#428bca",
+    borderRadius: 5,
+    marginBottom: 5,
+    marginTop: 5,
+    marginHorizontal: 5,
+    paddingHorizontal: 10,
+  },
+  listItem: {
+    backgroundColor: "#428bca",
+    padding: 10,
+    width: wp("80%"),
+    borderRadius: 5,
+    marginVertical: 5,
+    flex: 1,
+    alignItems: "center",
   },
 });

@@ -23,10 +23,10 @@ import { Husband } from "./husband";
 // import ValidationComponent from "react-native-form-validator";
 let RNFS = require("react-native-fs");
 
-var radio_props = [
+/* var radio_props = [
   { label: "no  ", value: 0 },
   { label: "yes", value: 1 },
-];
+]; */
 
 export default class Tab1 extends Component {
   constructor(props) {
@@ -115,7 +115,7 @@ export default class Tab1 extends Component {
         MonthlyIncome: "",
         incomeErr: "",
         skills: "",
-        zakat: 0,
+        zakat: false,
         gender: "",
         HbState: "",
         HbStateErr: "",
@@ -277,7 +277,7 @@ export default class Tab1 extends Component {
     } else {
       this.setState({ cnicErr: "" });
     }
-    if (gender === "female" && RelStatus === "Married") {
+    if (gender === "Female" && RelStatus === "Married") {
       if (HbState === "") {
         this.setState({
           HbStateErr: "Husband employement status field is empty",
@@ -346,11 +346,12 @@ export default class Tab1 extends Component {
     );
   }
   handleBackButtonClick() {
-    if (this.state.userID !== "") {
+    /*  if (this.state.userID !== "") {
       BackHandler.exitApp();
     } else {
       this.props.navigation.goBack(null);
-    }
+    } */
+    this.props.navigation.goBack(null);
     return true;
   }
 
@@ -394,7 +395,7 @@ export default class Tab1 extends Component {
         empStatus: state.empStatus,
         MonthlyIncome: state.MonthlyIncome,
         skills: state.skills,
-        cnic: `file://${state.fileUri}`,
+        cnic: state.fileUri,
       };
       console.log(personalInfo);
       // await AsyncStorage.setItem("Personal", JSON.stringify(personalInfo));
@@ -448,7 +449,7 @@ export default class Tab1 extends Component {
         this.setState({
           filepath: response.path,
           fileData: response.data,
-          fileUri: imagePath,
+          fileUri: `file://${imagePath}`,
         });
       }
     });
@@ -498,10 +499,7 @@ export default class Tab1 extends Component {
   renderFileUri() {
     if (this.state.fileUri) {
       return (
-        <Image
-          source={{ uri: `file://${this.state.fileUri}` }}
-          style={Style.images}
-        />
+        <Image source={{ uri: this.state.fileUri }} style={Style.images} />
       );
     } else {
       return null;
@@ -515,14 +513,7 @@ export default class Tab1 extends Component {
       ); */
     }
   }
-  onToggle = (value) => {
-    if (value === true) {
-      this.setState({ houseOwn: "own" });
-    }
-    if (value === false) {
-      this.setState({ houseOwn: "rent" });
-    }
-  };
+
   onStatusChange = (value) => {
     if (value === "-1") {
       this.setState({ HbState: "" });
@@ -550,7 +541,7 @@ export default class Tab1 extends Component {
     /* if (this.props.info) {
       console.log("data", this.props.info);
     } */
-    console.log(this.state.userID);
+    // console.log(this.state.fileUri);
     var {
       fnameErr,
       lnameErr,
@@ -574,7 +565,7 @@ export default class Tab1 extends Component {
     let input, husbandStatus;
     /*  let isFocused = this.props.navigation.isFocused();
     console.log("tab1", isFocused); */
-    if (gender === "female" && RelStatus === "Married") {
+    if (gender === "Female" && RelStatus === "Married") {
       husbandStatus = (
         <Husband
           data={this.state}
@@ -615,9 +606,9 @@ export default class Tab1 extends Component {
         {guardianErr ? <Text style={Style.error}>{guardianErr}</Text> : null}
       </View>
     );
-    if (gender === "male") {
+    if (gender === "Male") {
       input = father;
-    } else if (gender === "female") {
+    } else if (gender === "Female") {
       input = husband;
     } else {
       input = null;
@@ -655,9 +646,9 @@ export default class Tab1 extends Component {
                 }
               }}
             >
-              <Picker.Item label="select gender" value="-1" />
-              <Picker.Item label="male" value="male" />
-              <Picker.Item label="female" value="female" />
+              <Picker.Item label="Select gender" value="-1" />
+              <Picker.Item label="Male" value="Male" />
+              <Picker.Item label="Female" value="Female" />
             </Picker>
             {/*        <DropDownPicker
               items={[
@@ -691,19 +682,19 @@ export default class Tab1 extends Component {
               selectedValue={this.state.Religion}
               style={Style.picker}
               onValueChange={(value) => {
-                if (value === " -1") {
+                if (value === "-1") {
                   this.setState({ Religion: "" });
                 } else {
                   this.setState({ Religion: value });
                 }
               }}
             >
-              <Picker.Item label="select relegion" value="-1" />
+              <Picker.Item label="Select relegion" value="-1" />
               <Picker.Item label="Islam" value="Islam" />
               <Picker.Item label="Chritianity" value="Chritianity" />
               <Picker.Item label="Hinduism" value="Hinduism" />
-              <Picker.Item label="jew" value="jew" />
-              <Picker.Item label="other" value="other" />
+              <Picker.Item label="Jew" value="Jew" />
+              <Picker.Item label="Other" value="Other" />
             </Picker>
           </View>
           {/*       <DropDownPicker
@@ -730,14 +721,30 @@ export default class Tab1 extends Component {
           /> */}
           {ReligionErr ? <Text style={Style.error}>{ReligionErr}</Text> : null}
           {this.state.Religion === "Islam" ? (
-            <View style={Style.center}>
-              <Text>Eligible for zakat?</Text>
+            /*  <View style={Style.center}>
+              <Text style={{ marginBottom: 10 }}>Eligible for zakat?</Text>
               <RadioForm
                 radio_props={radio_props}
                 initial={this.state.zakat}
                 formHorizontal={true}
                 onPress={(event) => this.setState({ zakat: event })}
               />
+            </View> */
+            <View
+              style={{
+                width: "80%",
+                marginBottom: 10,
+                // alignItems: "flex-end",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ marginRight: "auto" }}>Eligible for zakat?</Text>
+              <View style={{ alignItems: "flex-end" }}>
+                <Switch
+                  value={this.state.zakat}
+                  onValueChange={(value) => this.setState({ zakat: value })}
+                />
+              </View>
             </View>
           ) : (
             <View></View>
@@ -749,8 +756,8 @@ export default class Tab1 extends Component {
             mode="date"
             placeholder="DOB"
             format="YYYY-MM-DD"
-            minDate="1980-05-01"
-            maxDate="2005-06-01"
+            minDate="1940-01-01"
+            // maxDate="2005-06-01"
             confirmBtnText="Confirm"
             cancelBtnText="Cancel"
             customStyles={{
@@ -833,12 +840,21 @@ export default class Tab1 extends Component {
             style={Style.input}
           ></TextInput>
           {AddressErr ? <Text style={Style.error}>{AddressErr}</Text> : null}
-          <View style={{ width: "80%", alignItems: "flex-start" }}>
-            <Text>House own?</Text>
-            <Switch
-              value={this.state.houseOwn}
-              onValueChange={(value) => this.setState({ houseOwn: value })}
-            />
+          <View
+            style={{
+              width: "80%",
+              marginBottom: 10,
+              // alignItems: "flex-end",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ marginRight: "auto" }}>House own?</Text>
+            <View style={{ alignItems: "flex-end" }}>
+              <Switch
+                value={this.state.houseOwn}
+                onValueChange={(value) => this.setState({ houseOwn: value })}
+              />
+            </View>
           </View>
           {!this.state.houseOwn ? (
             <>
@@ -866,12 +882,12 @@ export default class Tab1 extends Component {
                 }
               }}
             >
-              <Picker.Item label="select town" value="-1" />
+              <Picker.Item label="Select town" value="-1" />
               <Picker.Item label="Surjani" value="Surjani" />
               <Picker.Item label="North karachi" value="North karachi" />
               <Picker.Item label="New Karachi" value="New Karachi" />
               <Picker.Item label="Korangi" value="Korangi" />
-              <Picker.Item label="others" value="others" />
+              <Picker.Item label="Others" value="Others" />
             </Picker>
           </View>
           {/*  <View style={{ marginBottom: 10 }}>
@@ -967,7 +983,7 @@ export default class Tab1 extends Component {
               <Picker.Item label="Employment status" value="-1" />
               <Picker.Item label="Employed" value="Employed" />
               <Picker.Item label="Unemployed" value="Unemployed" />
-              <Picker.Item label="self-employed" value="Self-employed" />
+              <Picker.Item label="Self-employed" value="Self-employed" />
             </Picker>
           </View>
           {/*  <View style={{ marginBottom: 10 }}>
@@ -1006,13 +1022,13 @@ export default class Tab1 extends Component {
           <TextInput
             value={this.state.skills}
             onChangeText={(skills) => this.setState({ skills })}
-            placeholder={"Hands on Skills"}
+            placeholder={"Hands on skills"}
             style={Style.input}
           ></TextInput>
 
           <TouchableOpacity onPress={this.chooseImage} style={Style.upload}>
             <Text style={{ color: "#428bca", fontWeight: "bold" }}>
-              upload cnic Image
+              Upload CNIC image
             </Text>
           </TouchableOpacity>
           {cnicErr ? <Text style={Style.error}>{cnicErr}</Text> : null}
@@ -1020,7 +1036,7 @@ export default class Tab1 extends Component {
             <View>{this.renderFileUri()}</View>
           </View>
 
-          <Button title={"submit"} onPress={this.onSubmit.bind(this)} />
+          <Button title={"Submit"} onPress={this.onSubmit.bind(this)} />
           <Text></Text>
         </View>
       </ScrollView>

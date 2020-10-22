@@ -30,13 +30,14 @@ export default class Form extends Component {
     var userId = this.state.id;
     if (this.validate()) {
       this.props.saveID(parseInt(userId));
-      this.props.navigation.navigate("Tab1");
+      this.props.navigation.navigate("List");
+      // this.props.insertCheck();
     } else {
       console.log("error");
     }
 
     // console.log(userId);
-    // this.props.insertUser(data);
+    // this.props.insertCheck();
     // this.props.saveID(userId);
     // console.log(data);
 
@@ -85,7 +86,7 @@ export default class Form extends Component {
           onPress={this.onSubmit.bind(this)}
         />
 
-        {/*  <TouchableOpacity
+        <TouchableOpacity
           onPress={() => this.props.navigation.navigate("Tab1")}
         >
           <Text> Go to Form </Text>
@@ -99,7 +100,7 @@ export default class Form extends Component {
           onPress={() => this.props.navigation.navigate("Tab3")}
         >
           <Text> Go to tab3 </Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     );
   }

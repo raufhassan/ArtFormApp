@@ -4,8 +4,10 @@ import {
   GET_DEPENDENTS,
   GET_REMARKS,
   REMOVE_DATA,
+  LOGOUT_USER,
 } from "./types";
 import { openDatabase } from "react-native-sqlite-storage";
+import { cos } from "react-native-reanimated";
 var db = openDatabase({ name: "UserDatabase.db" });
 export const personalInfo = (userData) => {
   if (userData) {
@@ -54,7 +56,7 @@ export const insertUser = (user, dependent, userID, remarks) => (dispatch) => {
   var selectedFor = JSON.stringify(remarks.selectedFor);
   var images = JSON.stringify(remarks.imagesUri);
   var houseOwn = JSON.stringify(user.houseOwn);
-  var monthlyRent = parseInt(user.monthlyRent);
+  var zakat = JSON.stringify(user.zakat);
 
   db.transaction((tx) => {
     // Loop would be here in case of many values
@@ -68,7 +70,7 @@ export const insertUser = (user, dependent, userID, remarks) => (dispatch) => {
         user.gender,
         user.guardian,
         user.Religion,
-        user.zakat,
+        zakat,
         user.date,
         user.RelStatus,
         user.HbState,
@@ -79,7 +81,7 @@ export const insertUser = (user, dependent, userID, remarks) => (dispatch) => {
         user.HbReason,
         user.Address,
         houseOwn,
-        monthlyRent,
+        user.monthlyRent,
         user.Town,
         user.Area,
         user.profession,
@@ -100,7 +102,7 @@ export const insertUser = (user, dependent, userID, remarks) => (dispatch) => {
         console.log("Insert Results", results.rowsAffected);
         if (results.rowsAffected > 0) {
           dispatch({
-            type: REMOVE_DATA,
+            type: GET_ID,
             payload: null,
           });
           console.log("insertion successfull");
@@ -118,14 +120,17 @@ export const insertUser = (user, dependent, userID, remarks) => (dispatch) => {
     payload: null,
   }; */
 };
-export const insertDependents = (dependents, userID) => {
+export const insertDependents = (dependents, personID) => (dispatch) => {
+  console.log("function called");
+  console.log(dependents);
+  console.log("person id", personID);
   db.transaction((tx) => {
     // Loop would be here in case of many values
     for (let i = 0; i < dependents.length; i++) {
       tx.executeSql(
-        "INSERT INTO dependents (user_id,dep_name,dep_relation,dep_DOB,dep_education,dep_income,councelling,education) VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO dependents (person_id,dep_name,dep_relation,dep_DOB,dep_education,dep_income,councelling,education) VALUES (?,?,?,?,?,?,?,?)",
         [
-          userID,
+          personID,
           dependents[i].name,
           dependents[i].Relation,
           dependents[i].DOB,
@@ -141,6 +146,10 @@ export const insertDependents = (dependents, userID) => {
           if (results.rowsAffected > 0) {
             console.log("insertion successfull");
             // insert = true;
+            dispatch({
+              type: GET_ID,
+              payload: null,
+            });
           } else {
             console.log(" Failed");
           }
@@ -152,8 +161,41 @@ export const insertDependents = (dependents, userID) => {
       );
     }
   });
-  return {
+  /*   return {
     type: GET_ID,
     payload: null,
-  };
+  }; */
+};
+
+export const Logout = () => (dispatch) => {
+  dispatch({
+    type: LOGOUT_USER,
+  });
+};
+
+export const insertCheck = () => (dispatch) => {
+  db.transaction((tx) => {
+    // Loop would be here in case of many values
+
+    tx.executeSql(
+      "INSERT INTO table_user (user_name, user_contact, user_email) VALUES (?,?,?)",
+      ["hassdas", 234324, "sdds@gmail.com"],
+      (tx, results) => {
+        console.log("Insert Results", results.rowsAffected);
+        if (results.rowsAffected > 0) {
+          console.log("inserted");
+          console.log(results.rows.item(0));
+
+          // var x = db.last_insert_rowid();
+          // console.log(x);
+
+          dispatch({
+            type: LOGOUT_USER,
+          });
+        } else {
+          console.log("Updation Failed");
+        }
+      }
+    );
+  });
 };

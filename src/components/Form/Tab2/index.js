@@ -8,6 +8,7 @@ import {
   Picker,
   ScrollView,
   Button,
+  Switch,
   BackHandler,
 } from "react-native";
 // import { RadioButton } from "react-native-paper";
@@ -19,10 +20,10 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 
-var radio_props = [
+/* var radio_props = [
   { label: "no  ", value: 0 },
   { label: "yes", value: 1 },
-];
+]; */
 class Tab2 extends Component {
   constructor(props) {
     super(props);
@@ -54,8 +55,8 @@ class Tab2 extends Component {
             RelationErr: "",
             Education: "",
             EducationErr: "",
-            councelling: 0,
-            EducationSupport: 0,
+            councelling: false,
+            EducationSupport: false,
             age: null,
           },
         ],
@@ -70,7 +71,8 @@ class Tab2 extends Component {
         utilErr: "",
       };
     }
-    this.onAdd = this.onAdd.bind(this);
+    // this.onAdd = this.onAdd.bind(this);
+    // this.onRemove = this.onAdd.bind(this);
     // this.handleOnChange = this.handleOnChange.bind(this);
   }
 
@@ -179,8 +181,8 @@ class Tab2 extends Component {
         income: item.income,
         Relation: item.Relation,
         Education: item.Education,
-        councelling: item.councelling,
-        EducationSupport: item.EducationSupport,
+        councelling: JSON.stringify(item.councelling),
+        EducationSupport: JSON.stringify(item.EducationSupport),
         age: null,
       };
     });
@@ -251,12 +253,19 @@ class Tab2 extends Component {
       RelationErr: "",
       Education: "",
       EducationErr: "",
-      councelling: 0,
-      EducationSupport: 0,
+      councelling: false,
+      EducationSupport: false,
       age: null,
     };
     var data = this.state.Dependents;
     data.push(DepArray);
+    this.setState({ Dependents: data });
+
+    // console.log(this.state.Dependents);
+  }
+  onRemove() {
+    var data = this.state.Dependents;
+    data.pop();
     this.setState({ Dependents: data });
 
     // console.log(this.state.Dependents);
@@ -367,8 +376,8 @@ class Tab2 extends Component {
             mode="date"
             placeholder="DOB"
             format="YYYY-MM-DD"
-            minDate="1990-05-01"
-            maxDate="2020-06-01"
+            minDate="1940-01-01"
+            maxDate="2020-10-01"
             confirmBtnText="Confirm"
             cancelBtnText="Cancel"
             customStyles={{
@@ -405,9 +414,46 @@ class Tab2 extends Component {
           ) : (
             <View></View>
           )}
-
-          <View>
-            <Text>Recommended for Counselling?</Text>
+          <View
+            style={{
+              width: "80%",
+              marginBottom: 10,
+              // alignItems: "flex-end",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ marginRight: "auto" }}>
+              Recommended for Counselling?
+            </Text>
+            <View style={{ alignItems: "flex-end" }}>
+              <Switch
+                value={item.councelling}
+                onValueChange={(event) => this.handleCouncel(event, index)}
+              />
+            </View>
+          </View>
+          <View
+            style={{
+              width: "80%",
+              marginBottom: 10,
+              // alignItems: "flex-end",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ marginRight: "auto" }}>
+              Education Support Required?
+            </Text>
+            <View style={{ alignItems: "flex-end" }}>
+              <Switch
+                value={item.EducationSupport}
+                onValueChange={(event) => this.handleEdSupport(event, index)}
+              />
+            </View>
+          </View>
+          {/*   <View>
+            <Text style={{ marginBottom: 10 }}>
+              Recommended for Counselling?
+            </Text>
             <RadioForm
               radio_props={radio_props}
               initial={item.councelling}
@@ -415,15 +461,17 @@ class Tab2 extends Component {
               onPress={(event) => this.handleCouncel(event, index)}
             />
           </View>
-          <View style={{ marginStart: 0 }}>
-            <Text>Education Support Required?</Text>
+          <View>
+            <Text style={{ marginBottom: 10 }}>
+              Education Support Required?
+            </Text>
             <RadioForm
               radio_props={radio_props}
               initial={item.EducationSupport}
               formHorizontal={true}
               onPress={(event) => this.handleEdSupport(event, index)}
             />
-          </View>
+          </View> */}
         </View>
       );
     });
@@ -435,7 +483,7 @@ class Tab2 extends Component {
     // const goodbyeMessage = <Text> Goodbye, JSX! </Text>;
 
     return (
-      <ScrollView style={Style.scrollContainer}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={Style.container}>
           <View style={{ alignItems: "center" }}>
             <Text style={Style.myText}> Dependent Info</Text>
@@ -448,18 +496,32 @@ class Tab2 extends Component {
             style={Style.submit}
             onPress={this.onAdd.bind(this)}
           /> */}
-          <TouchableOpacity
-            Style={{ marginBottom: 5, marginTop: 5 }}
-            onPress={this.onAdd.bind(this)}
-          >
-            <Icon
-              style={{ marginBottom: 10 }}
-              name="plus-circle"
-              size={30}
-              color="#999"
-            />
-          </TouchableOpacity>
-          <View style={{ marginTop: 10 }}></View>
+          <View style={{ marginTop: 10, flexDirection: "row" }}>
+            <TouchableOpacity
+              style={Style.buttonStyle}
+              onPress={this.onAdd.bind(this)}
+            >
+              <Text style={{ color: "#fff" }}>Add</Text>
+              <Icon
+                style={{ marginLeft: 5 }}
+                name="plus-circle"
+                size={20}
+                color="#fff"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={Style.buttonStyle}
+              onPress={this.onRemove.bind(this)}
+            >
+              <Text style={{ color: "#fff" }}>Remove</Text>
+              <Icon
+                style={{ marginLeft: 5 }}
+                name="minus-circle"
+                size={20}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </View>
 
           <TextInput
             value={this.state.Rent}
